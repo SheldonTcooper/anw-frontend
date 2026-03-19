@@ -56,13 +56,23 @@ export default function Header() {
           AcompanhantesNaWeb
         </span>
 
-        {/* Botão publicar */}
-        <button
-          className="rounded px-4 py-2 text-sm font-bold uppercase tracking-wide text-white hover:opacity-90"
-          style={{ backgroundColor: "#C0306A" }}
-        >
-          Publicar Anúncio
-        </button>
+        {/* Ações direita */}
+        <div className="flex items-center gap-3">
+          <a
+            href="/login"
+            className="text-sm font-semibold hover:underline"
+            style={{ color: "#F2E6F5" }}
+          >
+            Entrar
+          </a>
+          <a
+            href="/login"
+            className="rounded px-4 py-2 text-sm font-bold uppercase tracking-wide text-white hover:opacity-90"
+            style={{ backgroundColor: "#C0306A" }}
+          >
+            Publicar Anúncio
+          </a>
+        </div>
       </div>
 
       {/* Linha 2 */}
