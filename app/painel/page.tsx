@@ -4,9 +4,9 @@ import { useState } from "react";
 import { Eye, MessageCircle, Phone, Edit, Trash2, Plus } from "lucide-react";
 
 const metricas = [
-  { label: "Visualizações", valor: 1284, icone: Eye, cor: "#a78bfa" },
-  { label: "Cliques WhatsApp", valor: 97, icone: MessageCircle, cor: "#25D366" },
-  { label: "Cliques Ligar", valor: 43, icone: Phone, cor: "#60a5fa" },
+  { label: "Visualizações", valor: 1234, icone: Eye, cor: "#a78bfa" },
+  { label: "Cliques WhatsApp", valor: 89, icone: MessageCircle, cor: "#25D366" },
+  { label: "Cliques Ligar", valor: 45, icone: Phone, cor: "#60a5fa" },
 ];
 
 const fotosAnuncio = Array.from({ length: 6 }, (_, i) => i);
