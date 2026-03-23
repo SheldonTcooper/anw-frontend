@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  phone     String?
+  whatsapp  String?
+  isActive  Boolean  @default(true)
+  role      String   @default("USER") // USER, ADMIN, MODERATOR
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  ads       Ad[]
+  payments  Payment[]
+}
+
+model Category {
+  id    String @id @default(uuid())
+  name  String @unique
+  slug  String @unique
+  icon  String?
+  color String? @default("#C0306A")
+  
+  ads   Ad[]
+}
+
+model Ad {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  age         Int?
+  price       Float?
+  location    String
+  images      String   // JSON string
+  phone       String
+  whatsapp    String
+  isActive    Boolean  @default(true)
+  isVip       Boolean  @default(false)
+  views       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+}
+
+model Payment {
+  id          String   @id @default(uuid())
+  amount      Float
+  status      String   @default("PENDING") // PENDING, PAID, CANCELLED, FAILED
+  method      String
+  reference   String?
+  description String?
+  createdAt   DateTime @default(now())
+  paidAt      DateTime?
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+}
