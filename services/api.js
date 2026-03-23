@@ -1,22 +1,25 @@
+// services/api.js
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://seudominio.com' 
+  ? 'https://acompanhantesdaweb.com.br' // Troque para seu domínio real de produção
   : 'http://localhost:3000'
 
 // Buscar categorias
 export async function getCategories() {
   try {
     const response = await fetch(`${API_BASE_URL}/api/categories`, {
-      cache: 'no-store'
+      cache: 'no-store' // Para garantir que os dados são sempre frescos
     })
     
     if (!response.ok) {
-      throw new Error('Erro ao buscar categorias')
+      // Tenta ler o erro do servidor, se disponível
+      const errorData = await response.json().catch(() => null);
+      throw new Error(errorData?.message || `Erro ao buscar categorias: ${response.status}`);
     }
     
     return await response.json()
   } catch (error) {
-    console.error('Erro:', error)
-    return []
+    console.error('Erro na API de categorias:', error)
+    return [] // Retorna um array vazio em caso de erro
   }
 }
 
@@ -36,13 +39,14 @@ export async function getAds(params = {}) {
     )
     
     if (!response.ok) {
-      throw new Error('Erro ao buscar anúncios')
+      const errorData = await response.json().catch(() => null);
+      throw new Error(errorData?.message || `Erro ao buscar anúncios: ${response.status}`);
     }
     
     return await response.json()
   } catch (error) {
-    console.error('Erro:', error)
-    return { ads: [], pagination: { page: 1, total: 0, pages: 0 } }
+    console.error('Erro na API de anúncios:', error)
+    return { ads: [], pagination: { page: 1, total: 0, pages: 0 } } // Retorna estrutura padrão em caso de erro
   }
 }
 
@@ -58,12 +62,13 @@ export async function createAd(adData) {
     })
     
     if (!response.ok) {
-      throw new Error('Erro ao criar anúncio')
+      const errorData = await response.json().catch(() => null);
+      throw new Error(errorData?.message || `Erro ao criar anúncio: ${response.status}`);
     }
     
     return await response.json()
   } catch (error) {
-    console.error('Erro:', error)
-    throw error
+    console.error('Erro ao criar anúncio:', error)
+    throw error // Lança o erro para ser tratado onde a função for chamada
   }
 }

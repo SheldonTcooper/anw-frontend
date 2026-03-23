@@ -1,3 +1,4 @@
+import { getCategories, getAds } from '@/services/api'
 'use client'
 
 export default function Home() {
