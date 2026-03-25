@@ -6,7 +6,8 @@
       "Bash(export PATH=\"/c/Program Files/nodejs:$PATH\")",
       "Bash(cp:*)",
       "Bash(npm install:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(npm init:*)"
     ]
   }
 }
