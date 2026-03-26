@@ -5,3 +5,185 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model anuncios {
+  id                 String               @id
+  usuarioId          String
+  titulo             String
+  slug               String               @unique
+  descricao          String?
+  cidade             String
+  bairro             String?
+  estado             String               @db.Char(2)
+  dataNascimento     DateTime?
+  cache              Decimal?             @db.Decimal(10, 2)
+  telefonePublico    String?
+  whatsapp           String?
+  plano              PlanoAnuncio         @default(ORGANICO)
+  status             StatusAnuncio        @default(EM_ANALISE)
+  verificada         Boolean              @default(false)
+  disponivelAgora    Boolean              @default(false)
+  temLocal           Boolean              @default(false)
+  temAr              Boolean              @default(false)
+  temGaragem         Boolean              @default(false)
+  atende24h          Boolean              @default(false)
+  aceitaCartao       Boolean              @default(false)
+  fazPernoite        Boolean              @default(false)
+  expiracaoEm        DateTime?
+  criadoEm           DateTime             @default(now())
+  atualizadoEm       DateTime
+  usuarios           usuarios             @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  anuncios_tags      anuncios_tags[]
+  favoritos          favoritos[]
+  metricas           metricas[]
+  midias             midias[]
+  planos_contratados planos_contratados[]
+
+  @@index([cidade, estado])
+  @@index([slug])
+  @@index([status, plano])
+}
+
+model anuncios_tags {
+  anuncioId String
+  tagId     String
+  anuncios  anuncios @relation(fields: [anuncioId], references: [id], onDelete: Cascade)
+  tags      tags     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([anuncioId, tagId])
+}
+
+model favoritos {
+  usuarioId String
+  anuncioId String
+  criadoEm  DateTime @default(now())
+  anuncios  anuncios @relation(fields: [anuncioId], references: [id], onDelete: Cascade)
+  usuarios  usuarios @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@id([usuarioId, anuncioId])
+}
+
+model metricas {
+  id        String      @id
+  anuncioId String
+  tipo      TipoMetrica
+  ip        String?
+  userAgent String?
+  criadoEm  DateTime    @default(now())
+  anuncios  anuncios    @relation(fields: [anuncioId], references: [id], onDelete: Cascade)
+
+  @@index([anuncioId, tipo])
+  @@index([criadoEm])
+}
+
+model midias {
+  id        String    @id
+  anuncioId String
+  tipo      TipoMidia @default(FOTO)
+  url       String
+  isCapa    Boolean   @default(false)
+  aprovada  Boolean   @default(false)
+  ordem     Int       @default(0)
+  criadoEm  DateTime  @default(now())
+  anuncios  anuncios  @relation(fields: [anuncioId], references: [id], onDelete: Cascade)
+
+  @@index([anuncioId])
+}
+
+model parceiros {
+  id           String   @id
+  nome         String
+  slug         String   @unique
+  logoUrl      String?
+  siteUrl      String?
+  descricao    String?
+  ativo        Boolean  @default(true)
+  ordem        Int      @default(0)
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime
+}
+
+model planos_contratados {
+  id              String          @id
+  usuarioId       String
+  anuncioId       String
+  plano           PlanoAnuncio
+  valorPago       Decimal         @db.Decimal(10, 2)
+  statusPagamento StatusPagamento @default(PENDENTE)
+  gatewayId       String?
+  inicioEm        DateTime?
+  expiracaoEm     DateTime?
+  criadoEm        DateTime        @default(now())
+  atualizadoEm    DateTime
+  anuncios        anuncios        @relation(fields: [anuncioId], references: [id])
+  usuarios        usuarios        @relation(fields: [usuarioId], references: [id])
+
+  @@index([anuncioId])
+  @@index([usuarioId])
+}
+
+model tags {
+  id            String          @id
+  slug          String          @unique
+  nome          String
+  cluster       String?
+  procuras      Int             @default(0)
+  anuncios_tags anuncios_tags[]
+}
+
+model usuarios {
+  id                 String               @id
+  email              String               @unique
+  senhaHash          String
+  tipo               TipoUsuario          @default(CLIENTE)
+  nome               String
+  telefone           String?
+  emailVerificado    Boolean              @default(false)
+  ativo              Boolean              @default(true)
+  criadoEm           DateTime             @default(now())
+  atualizadoEm       DateTime
+  anuncios           anuncios[]
+  favoritos          favoritos[]
+  planos_contratados planos_contratados[]
+}
+
+enum PlanoAnuncio {
+  ORGANICO
+  PAGO
+  SUPER_DESTAQUE
+  SUPERTOP
+  ULTRATOP
+}
+
+enum StatusAnuncio {
+  EM_ANALISE
+  ATIVO
+  PAUSADO
+  EXPIRADO
+  REMOVIDO
+}
+
+enum StatusPagamento {
+  PENDENTE
+  PAGO
+  CANCELADO
+  REEMBOLSADO
+}
+
+enum TipoMetrica {
+  VISUALIZACAO
+  CLIQUE_WHATS
+  CLIQUE_LIGAR
+  FAVORITO
+}
+
+enum TipoMidia {
+  FOTO
+  VIDEO
+}
+
+enum TipoUsuario {
+  ANUNCIANTE
+  CLIENTE
+  ADMIN
+}
