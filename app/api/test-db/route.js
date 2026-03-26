@@ -1,23 +1,25 @@
-import { PrismaClient } from '@prisma/client'
+export const dynamic = 'force-dynamic'
 
+export async function GET() {
+  try {
+    const { PrismaClient } = await import('@prisma/client')
     const prisma = new PrismaClient()
-
-    export async function GET() {
-      try {
-        // Teste simples de conexão
-        await prisma.$connect()
-        
-        return Response.json({ 
-          success: true, 
-          message: "Conexão com banco OK!",
-          timestamp: new Date().toISOString()
-        })
-      } catch (error) {
-        return Response.json({ 
-          success: false, 
-          error: error.message 
-        }, { status: 500 })
-      } finally {
-        await prisma.$disconnect()
-      }
-    }
+    
+    await prisma.$connect()
+    
+    const result = await Response.json({
+      success: true,
+      message: "Conexão com banco OK!",
+      timestamp: new Date().toISOString()
+    })
+    
+    await prisma.$disconnect()
+    return result
+    
+  } catch (error) {
+    return Response.json({
+      success: false,
+      error: error.message
+    }, { status: 500 })
+  }
+}
