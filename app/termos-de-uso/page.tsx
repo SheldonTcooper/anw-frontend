@@ -8,7 +8,7 @@ export default function TermosDeUso() {
         <section className="mb-8">
           <h2 className="text-xl font-semibold text-pink-400 mb-3">1. Aceitação dos Termos</h2>
           <p className="text-gray-300 leading-relaxed">
-            Ao acessar e utilizar a plataforma Acompanhantes da Web (ANW), você concorda com estes
+            Ao acessar e utilizar a plataforma AcompanhantesNaWeb (ANW), você concorda com estes
             Termos de Uso. Se não concordar com qualquer parte destes termos, não utilize nossa plataforma.
           </p>
         </section>

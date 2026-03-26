@@ -61,7 +61,7 @@ export default function Home() {
       <div className="relative bg-black/50">
         <div className="container mx-auto px-4 py-20 text-center">
           <h1 className="text-5xl font-bold text-white mb-4">
-            Acompanhantes da Web
+            AcompanhantesNaWeb
           </h1>
           <p className="text-xl text-pink-200 mb-8">
             As mais belas e sofisticadas acompanhantes do Brasil
