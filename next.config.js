@@ -1,8 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Isso é importante para que o Next.js lide corretamente com módulos externos no build
-  experimental: {
-    esmExternals: false,
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        dns: false,
+        'pg-native': false,
+      }
+    }
+    return config
   },
 }
 
