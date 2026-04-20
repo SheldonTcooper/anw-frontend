@@ -4,6 +4,7 @@ import "./globals.css";
 import AvisoMaioridade from "./components/AvisoMaioridade";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import PopupDestaque from "./components/PopupDestaque";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -17,19 +18,18 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "AcompanhantesNaWeb — Acompanhantes do Brasil",
-  description: "As mais belas e sofisticadas acompanhantes do Brasil. Encontre acompanhantes em sua cidade.",
+  title: "AcompanhantesNaWeb - Acompanhantes do Brasil",
+  description: "As mais belas e sofisticadas acompanhantes do Brasil.",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AvisoMaioridade />
+        <PopupDestaque />
         <Header />
         {children}
         <Footer />
