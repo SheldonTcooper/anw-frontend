@@ -1,78 +1,70 @@
 export default function TermosDeUso() {
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-200 py-16 px-4">
+    <div className="min-h-screen text-gray-200 py-16 px-4" style={{ backgroundColor: "#1A0A1E" }}>
       <div className="max-w-3xl mx-auto">
         <h1 className="text-4xl font-bold text-white mb-2">Termos de Uso</h1>
-        <p className="text-gray-400 mb-10">Última atualização: março de 2026</p>
+        <p className="mb-10" style={{ color: "#c9a8e0" }}>Ultima atualizacao: abril de 2026</p>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-pink-400 mb-3">1. Aceitação dos Termos</h2>
-          <p className="text-gray-300 leading-relaxed">
-            Ao acessar e utilizar a plataforma AcompanhantesNaWeb (ANW), você concorda com estes
-            Termos de Uso. Se não concordar com qualquer parte destes termos, não utilize nossa plataforma.
+          <h2 className="text-xl font-semibold mb-3" style={{ color: "#C0306A" }}>1. Aceitacao dos Termos</h2>
+          <p className="leading-relaxed" style={{ color: "#c9a8e0" }}>
+            Ao acessar e utilizar a plataforma AcompanhantesNaWeb (ANW), voce concorda com estes Termos de Uso. Se nao concordar com qualquer parte destes termos, nao utilize nossa plataforma.
           </p>
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-pink-400 mb-3">2. Elegibilidade</h2>
-          <p className="text-gray-300 leading-relaxed">
-            O uso desta plataforma é restrito a maiores de 18 anos. Ao se cadastrar, você declara
-            ter idade legal para acessar conteúdo adulto conforme a legislação vigente em seu país.
+          <h2 className="text-xl font-semibold mb-3" style={{ color: "#C0306A" }}>2. Elegibilidade</h2>
+          <p className="leading-relaxed" style={{ color: "#c9a8e0" }}>
+            O uso desta plataforma e restrito a maiores de 18 anos. Ao se cadastrar, voce declara ter idade legal para acessar conteudo adulto conforme a legislacao vigente em seu pais.
           </p>
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-pink-400 mb-3">3. Uso da Plataforma</h2>
-          <p className="text-gray-300 leading-relaxed mb-2">É expressamente proibido:</p>
-          <ul className="list-disc list-inside text-gray-300 space-y-1">
-            <li>Publicar conteúdo envolvendo menores de idade</li>
+          <h2 className="text-xl font-semibold mb-3" style={{ color: "#C0306A" }}>3. Uso da Plataforma</h2>
+          <p className="leading-relaxed mb-2" style={{ color: "#c9a8e0" }}>E expressamente proibido:</p>
+          <ul className="list-disc list-inside space-y-1" style={{ color: "#c9a8e0" }}>
+            <li>Publicar conteudo envolvendo menores de idade</li>
             <li>Utilizar identidade falsa ou se passar por outra pessoa</li>
-            <li>Praticar qualquer forma de assédio ou discriminação</li>
+            <li>Praticar qualquer forma de assedio ou discriminacao</li>
             <li>Usar a plataforma para fins ilegais</li>
-            <li>Realizar scraping ou extração automatizada de dados</li>
+            <li>Realizar scraping ou extracao automatizada de dados</li>
           </ul>
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-pink-400 mb-3">4. Conteúdo dos Anúncios</h2>
-          <p className="text-gray-300 leading-relaxed">
-            Os anunciantes são inteiramente responsáveis pelo conteúdo publicado. A ANW se reserva o
-            direito de remover qualquer anúncio que viole estes termos ou a legislação vigente, sem
-            aviso prévio.
+          <h2 className="text-xl font-semibold mb-3" style={{ color: "#C0306A" }}>4. Conteudo dos Anuncios</h2>
+          <p className="leading-relaxed" style={{ color: "#c9a8e0" }}>
+            Os anunciantes sao inteiramente responsaveis pelo conteudo publicado. A ANW se reserva o direito de remover qualquer anuncio que viole estes termos ou a legislacao vigente, sem aviso previo.
           </p>
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-pink-400 mb-3">5. Pagamentos</h2>
-          <p className="text-gray-300 leading-relaxed">
-            Os planos pagos são cobrados conforme descrito na página de preços. Não realizamos
-            reembolsos após a ativação do plano, exceto nos casos previstos pelo Código de Defesa
-            do Consumidor.
+          <h2 className="text-xl font-semibold mb-3" style={{ color: "#C0306A" }}>5. Pagamentos</h2>
+          <p className="leading-relaxed" style={{ color: "#c9a8e0" }}>
+            Os planos pagos sao cobrados via PIX conforme descrito na pagina de precos. O anuncio so sera ativado apos confirmacao do pagamento pelo administrador. Nao realizamos reembolsos apos a ativacao do plano, exceto nos casos previstos pelo Codigo de Defesa do Consumidor.
           </p>
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-pink-400 mb-3">6. Limitação de Responsabilidade</h2>
-          <p className="text-gray-300 leading-relaxed">
-            A ANW atua como plataforma intermediária e não se responsabiliza por negociações,
-            encontros ou qualquer interação realizada entre usuários fora da plataforma.
+          <h2 className="text-xl font-semibold mb-3" style={{ color: "#C0306A" }}>6. Responsabilidade</h2>
+          <p className="leading-relaxed" style={{ color: "#c9a8e0" }}>
+            A ANW atua exclusivamente como plataforma de classificados e nao se responsabiliza por negociacoes, encontros, servicos prestados ou qualquer interacao realizada entre usuarios fora da plataforma. Todo contato entre anunciante e cliente e feito diretamente pelo WhatsApp ou Telegram do anunciante.
           </p>
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-pink-400 mb-3">7. Alterações nos Termos</h2>
-          <p className="text-gray-300 leading-relaxed">
-            Reservamo-nos o direito de atualizar estes termos a qualquer momento. O uso continuado
-            da plataforma após alterações constitui aceitação dos novos termos.
+          <h2 className="text-xl font-semibold mb-3" style={{ color: "#C0306A" }}>7. Alteracoes nos Termos</h2>
+          <p className="leading-relaxed" style={{ color: "#c9a8e0" }}>
+            Reservamo-nos o direito de atualizar estes termos a qualquer momento. O uso continuado da plataforma apos alteracoes constitui aceitacao dos novos termos.
           </p>
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-pink-400 mb-3">8. Contato</h2>
-          <p className="text-gray-300 leading-relaxed">
-            Dúvidas sobre estes termos? Entre em contato:{' '}
-            <a href="mailto:contato@anw.com.br" className="text-pink-400 hover:underline">
-              contato@anw.com.br
+          <h2 className="text-xl font-semibold mb-3" style={{ color: "#C0306A" }}>8. Contato</h2>
+          <p className="leading-relaxed" style={{ color: "#c9a8e0" }}>
+            Duvidas sobre estes termos? Entre em contato:{' '}
+            <a href="mailto:contato@acompanhantesnaweb.com.br" style={{ color: "#C0306A" }}>
+              contato@acompanhantesnaweb.com.br
             </a>
           </p>
         </section>
