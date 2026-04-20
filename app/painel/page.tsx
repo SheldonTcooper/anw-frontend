@@ -3,40 +3,15 @@ import { useState } from "react";
 import { Eye, MessageCircle, Phone, Edit, Star } from "lucide-react";
 
 const planos = [
-  {
-    id: "PAGO",
-    nome: "Basico",
-    preco: "R$ 49/mes",
-    cor: "#60a5fa",
-    beneficios: ["Aparece na listagem", "Fotos ilimitadas", "Botao WhatsApp"],
-  },
-  {
-    id: "SUPER_DESTAQUE",
-    nome: "Destaque",
-    preco: "R$ 99/mes",
-    cor: "#a78bfa",
-    beneficios: ["Tudo do Basico", "Aparece no topo", "Badge Destaque"],
-  },
-  {
-    id: "SUPERTOP",
-    nome: "Super Top",
-    preco: "R$ 149/mes",
-    cor: "#C0306A",
-    beneficios: ["Tudo do Destaque", "Primeiro da lista", "Badge Super Top"],
-  },
-  {
-    id: "ULTRATOP",
-    nome: "Ultra Top",
-    preco: "R$ 199/mes",
-    cor: "#B8960C",
-    beneficios: ["Tudo do Super Top", "Popup de destaque", "Badge Gold"],
-  },
+  { id: "PAGO", nome: "Basico", preco: "R$ 49/mes", cor: "#60a5fa", beneficios: ["Aparece na listagem", "Fotos ilimitadas", "Botao WhatsApp"] },
+  { id: "SUPER_DESTAQUE", nome: "Destaque", preco: "R$ 99/mes", cor: "#a78bfa", beneficios: ["Tudo do Basico", "Aparece no topo", "Badge Destaque"] },
+  { id: "SUPERTOP", nome: "Super Top", preco: "R$ 149/mes", cor: "#C0306A", beneficios: ["Tudo do Destaque", "Primeiro da lista", "Badge Super Top"] },
+  { id: "ULTRATOP", nome: "Ultra Top", preco: "R$ 199/mes", cor: "#B8960C", beneficios: ["Tudo do Super Top", "Popup de destaque", "Badge Gold"] },
 ];
 
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`rounded-xl p-5 ${className}`}
-      style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }}>
+    <div className={"rounded-xl p-5 " + className} style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }}>
       {children}
     </div>
   );
@@ -44,20 +19,20 @@ function Card({ children, className = "" }: { children: React.ReactNode; classNa
 
 export default function PainelAnunciante() {
   const [disponivel, setDisponivel] = useState(true);
-  const [abaSelecionada, setAbaSelecionada] = useState<"painel" | "planos">("painel");
-  const [planoSelecionado, setPlanoSelecionado] = useState<string | null>(null);
+  const [aba, setAba] = useState("painel");
+  const [planoSelecionado, setPlanoSelecionado] = useState("");
 
   const handleEscolherPlano = (planoId: string) => {
     setPlanoSelecionado(planoId);
     const plano = planos.find(p => p.id === planoId);
-    alert(`Voce escolheu o plano ${plano?.nome}!\n\nEntraremos em contato pelo WhatsApp para enviar o QR Code PIX e ativar seu plano.`);
+    const nome = plano ? plano.nome : planoId;
+    alert("Voce escolheu o plano " + nome + "! Entraremos em contato pelo WhatsApp para enviar o QR Code PIX e ativar seu plano.");
   };
 
   return (
     <main className="min-h-screen px-4 py-8 sm:px-8" style={{ backgroundColor: "#1A0A1E" }}>
       <div className="mx-auto max-w-4xl flex flex-col gap-6">
 
-        {/* cabecalho */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold text-white">Meu Painel</h1>
@@ -69,25 +44,21 @@ export default function PainelAnunciante() {
           </span>
         </div>
 
-        {/* abas */}
         <div className="flex gap-2">
-          {[
-            { id: "painel", label: "Meu Anuncio" },
-            { id: "planos", label: "Planos" },
-          ].map(({ id, label }) => (
-            <button key={id} onClick={() => setAbaSelecionada(id as any)}
-              className="rounded-lg px-5 py-2 text-sm font-bold transition-colors"
-              style={abaSelecionada === id
-                ? { backgroundColor: "#C0306A", color: "#fff" }
-                : { backgroundColor: "#250C30", color: "#c9a8e0", border: "1px solid #4A1A5C" }}>
-              {label}
-            </button>
-          ))}
+          <button onClick={() => setAba("painel")}
+            className="rounded-lg px-5 py-2 text-sm font-bold transition-colors"
+            style={aba === "painel" ? { backgroundColor: "#C0306A", color: "#fff" } : { backgroundColor: "#250C30", color: "#c9a8e0", border: "1px solid #4A1A5C" }}>
+            Meu Anuncio
+          </button>
+          <button onClick={() => setAba("planos")}
+            className="rounded-lg px-5 py-2 text-sm font-bold transition-colors"
+            style={aba === "planos" ? { backgroundColor: "#C0306A", color: "#fff" } : { backgroundColor: "#250C30", color: "#c9a8e0", border: "1px solid #4A1A5C" }}>
+            Planos
+          </button>
         </div>
 
-        {abaSelecionada === "painel" && (
-          <>
-            {/* toggle disponivel */}
+        {aba === "painel" && (
+          <div className="flex flex-col gap-4">
             <Card>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -113,7 +84,6 @@ export default function PainelAnunciante() {
               </div>
             </Card>
 
-            {/* metricas */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               {[
                 { label: "Visualizacoes", valor: 0, icone: Eye, cor: "#a78bfa" },
@@ -122,7 +92,7 @@ export default function PainelAnunciante() {
               ].map(({ label, valor, icone: Icone, cor }) => (
                 <Card key={label}>
                   <div className="flex items-center gap-4">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: `${cor}20` }}>
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: cor + "20" }}>
                       <Icone size={22} style={{ color: cor }} />
                     </div>
                     <div>
@@ -134,21 +104,19 @@ export default function PainelAnunciante() {
               ))}
             </div>
 
-            {/* acoes */}
             <div className="flex flex-wrap gap-3">
               <a href="/anunciar"
                 className="flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-bold text-white hover:opacity-90"
                 style={{ backgroundColor: "#C0306A" }}>
                 <Edit size={16} /> Editar Anuncio
               </a>
-              <button onClick={() => setAbaSelecionada("planos")}
+              <button onClick={() => setAba("planos")}
                 className="flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-bold text-white hover:opacity-70"
                 style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }}>
                 <Star size={16} /> Upgrade de Plano
               </button>
             </div>
 
-            {/* contato suporte */}
             <Card>
               <h2 className="font-bold text-white mb-3">Precisa de ajuda?</h2>
               <p className="text-sm mb-4" style={{ color: "#c9a8e0" }}>
@@ -160,17 +128,46 @@ export default function PainelAnunciante() {
                 <MessageCircle size={18} /> Falar com Suporte
               </a>
             </Card>
-          </>
+          </div>
         )}
 
-        {abaSelecionada === "planos" && (
+        {aba === "planos" && (
           <div className="flex flex-col gap-4">
             <p className="text-sm" style={{ color: "#c9a8e0" }}>
-              Escolha o plano ideal para voce. Apos a escolha, entraremos em contato pelo WhatsApp para enviar o QR Code PIX.
+              Escolha o plano ideal. Apos a escolha, entraremos em contato pelo WhatsApp para enviar o QR Code PIX.
             </p>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {planos.map((plano) => (
                 <div key={plano.id} className="rounded-xl p-5 flex flex-col gap-3"
-                  style={{ backgroundColor: "#250C30", border: `2px solid ${planoSelecionado === plano.id ? plano.cor : "#4A1A5C"}` }}>
+                  style={{ backgroundColor: "#250C30", border: "2px solid " + (planoSelecionado === plano.id ? plano.cor : "#4A1A5C") }}>
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-bold text-white">{plano.nome}</h3>
+                    <span className="text-xl font-bold" style={{ color: plano.cor }}>{plano.preco}</span>
+                  </div>
+                  <ul className="flex flex-col gap-1">
+                    {plano.beneficios.map(b => (
+                      <li key={b} className="flex items-center gap-2 text-sm" style={{ color: "#c9a8e0" }}>
+                        <span style={{ color: plano.cor }}>✓</span> {b}
+                      </li>
+                    ))}
+                  </ul>
+                  <button onClick={() => handleEscolherPlano(plano.id)}
+                    className="w-full rounded-lg py-2.5 text-sm font-bold text-white hover:opacity-90"
+                    style={{ backgroundColor: plano.cor }}>
+                    Escolher Plano
+                  </button>
+                </div>
+              ))}
+            </div>
+            <Card>
+              <p className="text-sm text-center" style={{ color: "#c9a8e0" }}>
+                Apos escolher seu plano, enviaremos o QR Code PIX pelo WhatsApp cadastrado. Seu anuncio sera ativado apos confirmacao do pagamento.
+              </p>
+            </Card>
+          </div>
+        )}
+
+      </div>
+    </main>
+  );
+}
