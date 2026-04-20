@@ -2,16 +2,10 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(request) {
   try {
-    const { PrismaClient } = await import('@prisma/client')
-    const { PrismaPg } = await import('@prisma/adapter-pg')
-
-    const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
-    const prisma = new PrismaClient({ adapter })
-
+    const { prisma } = await import('../../../../lib/prisma')
     const body = await request.json()
-    const { titulo, descricao, cidade, estado, bairro, whatsapp, cache, dataNascimento, servicos } = body
+    const { titulo, descricao, cidade, estado, bairro, whatsapp, cache, dataNascimento } = body
 
-    // Gerar slug único
     const slug = titulo
       .toLowerCase()
       .normalize('NFD')
@@ -20,11 +14,9 @@ export async function POST(request) {
       .replace(/\s+/g, '-')
       .trim() + '-' + Date.now()
 
-    // Criar usuário temporário se não existir
     const email = `${whatsapp}@anw.temp.br`
-    
     let usuario = await prisma.usuarios.findUnique({ where: { email } })
-    
+
     if (!usuario) {
       usuario = await prisma.usuarios.create({
         data: {
@@ -56,8 +48,6 @@ export async function POST(request) {
         atualizadoEm: new Date(),
       }
     })
-
-    await prisma.$disconnect()
 
     return Response.json({ success: true, slug: anuncio.slug, id: anuncio.id })
   } catch (error) {
