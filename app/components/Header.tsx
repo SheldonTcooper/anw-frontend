@@ -9,7 +9,7 @@ const categorias = [
   "Gays",
   "Casais",
   "Massagistas",
-  "Chamadas de Vídeo",
+  "Chamadas de Video",
 ];
 
 export default function Header() {
@@ -53,12 +53,8 @@ export default function Header() {
           <a href="/login" className="text-sm font-semibold hover:underline" style={{ color: "#F2E6F5" }}>
             Entrar
           </a>
-          
-            href="/anunciar"
-            className="rounded px-4 py-2 text-sm font-bold uppercase tracking-wide text-white hover:opacity-90"
-            style={{ backgroundColor: "#C0306A" }}
-          >
-            Publicar Anúncio
+          <a href="/anunciar" className="rounded px-4 py-2 text-sm font-bold uppercase tracking-wide text-white hover:opacity-90" style={{ backgroundColor: "#C0306A" }}>
+            Publicar Anuncio
           </a>
         </div>
       </div>
@@ -66,7 +62,7 @@ export default function Header() {
       <div className="mt-3">
         <input
           type="text"
-          placeholder="Buscar por nome, cidade ou serviço..."
+          placeholder="Buscar por nome, cidade ou servico..."
           className="w-full rounded px-4 py-2 text-sm text-white placeholder-gray-400 outline-none focus:ring-1 focus:ring-[#C0306A]"
           style={{ backgroundColor: "#3a1550", border: "1px solid #4a1f60" }}
         />
