@@ -14,6 +14,65 @@ const abas: { id: Aba; label: string }[] = [
 ];
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+const ADMIN_PIN = "115566";
+
+function FormAdmin() {
+  const router = useRouter();
+  const [pin, setPin] = useState("");
+  const [erro, setErro] = useState("");
+  const [carregando, setCarregando] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErro("");
+    setCarregando(true);
+    await new Promise(r => setTimeout(r, 500));
+    if (pin === ADMIN_PIN) {
+      document.cookie = `token=admin-pin-token; path=/; max-age=${60 * 60 * 24 * 7}`;
+      localStorage.setItem("usuario", JSON.stringify({
+        id: "admin_001",
+        nome: "Admin ANW",
+        email: "contato@acompanhantesnaweb.com.br",
+        tipo: "ADMIN"
+      }));
+      router.push("/admin");
+    } else {
+      setErro("PIN incorreto");
+    }
+    setCarregando(false);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      {erro && (
+        <div className="rounded-lg px-4 py-3 text-sm text-red-300" style={{ backgroundColor: "#3a0a0a", border: "1px solid #ef4444" }}>
+          {erro}
+        </div>
+      )}
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-medium" style={{ color: "#c9a8e0" }}>PIN de acesso</label>
+        <input
+          type="password"
+          value={pin}
+          onChange={(e) => setPin(e.target.value)}
+          placeholder="••••••"
+          required
+          maxLength={6}
+          className="rounded-lg px-4 py-3 text-sm text-white placeholder-gray-500 outline-none focus:ring-1 focus:ring-[#C0306A] tracking-widest text-center text-xl"
+          style={{ backgroundColor: "#1A0A1E", border: "1px solid #4A1A5C" }}
+        />
+      </div>
+      <button
+        type="submit"
+        disabled={carregando}
+        className="rounded-lg py-3 font-bold uppercase tracking-wide text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+        style={{ backgroundColor: "#C0306A" }}
+      >
+        {carregando ? "Verificando..." : "Entrar"}
+      </button>
+    </form>
+  );
+}
 
 function FormLogin({ temCriarConta, tipo }: { temCriarConta: boolean; tipo: Aba }) {
   const router = useRouter();
@@ -52,14 +111,16 @@ function FormLogin({ temCriarConta, tipo }: { temCriarConta: boolean; tipo: Aba 
         const res = await fetch(`${API_URL}/api/auth/registro`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ nome, email, senha, telefone }),
+          body: JSON.stringify({ nome, email, senha, telefone, tipo: tipo.toUpperCase() }),
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Erro ao criar conta");
 
         document.cookie = `token=${data.token}; path=/; max-age=${60 * 60 * 24 * 7}`;
         localStorage.setItem("usuario", JSON.stringify(data.usuario));
-        router.push("/painel");
+
+        if (data.usuario.tipo === "ANUNCIANTE") router.push("/painel");
+        else router.push("/cliente");
       }
     } catch (err: any) {
       setErro(err.message);
@@ -197,7 +258,11 @@ export default function LoginPage() {
           ))}
         </div>
 
-        <FormLogin temCriarConta={abaAtiva !== "admin"} tipo={abaAtiva} />
+        {abaAtiva === "admin" ? (
+          <FormAdmin />
+        ) : (
+          <FormLogin temCriarConta={true} tipo={abaAtiva as "anunciante" | "cliente"} />
+        )}
       </div>
     </main>
   );

@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 
@@ -18,9 +17,7 @@ export default function Header() {
 
   return (
     <header style={{ backgroundColor: "#250C30" }} className="w-full px-4 py-3">
-      {/* Linha 1 */}
       <div className="flex items-center justify-between gap-4">
-        {/* Menu dropdown */}
         <div className="relative">
           <button
             onClick={() => setMenuAberto((v) => !v)}
@@ -48,25 +45,16 @@ export default function Header() {
           )}
         </div>
 
-        {/* Logo */}
-        <span
-          className="text-xl font-bold"
-          style={{ color: "#C0306A" }}
-        >
+        <a href="/" className="text-xl font-bold" style={{ color: "#C0306A" }}>
           AcompanhantesNaWeb
-        </span>
+        </a>
 
-        {/* Ações direita */}
         <div className="flex items-center gap-3">
-          <a
-            href="/login"
-            className="text-sm font-semibold hover:underline"
-            style={{ color: "#F2E6F5" }}
-          >
+          <a href="/login" className="text-sm font-semibold hover:underline" style={{ color: "#F2E6F5" }}>
             Entrar
           </a>
-          <a
-            href="/login"
+          
+            href="/anunciar"
             className="rounded px-4 py-2 text-sm font-bold uppercase tracking-wide text-white hover:opacity-90"
             style={{ backgroundColor: "#C0306A" }}
           >
@@ -75,7 +63,6 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Linha 2 */}
       <div className="mt-3">
         <input
           type="text"
@@ -85,7 +72,6 @@ export default function Header() {
         />
       </div>
 
-      {/* Linha 3 */}
       <div className="mt-2 text-sm" style={{ color: "#F2E6F5" }}>
         Acompanhantes em Brasil
       </div>
