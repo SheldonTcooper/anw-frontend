@@ -15,9 +15,6 @@ interface Anuncio {
   slug: string;
 }
 
-const PIN_PADRAO = "1234";
-const PIN_KEY = "anw_admin_pin";
-
 const badgeStatus: Record<Status, { label: string; bg: string; color: string }> = {
   EM_ANALISE: { label: "Pendente",  bg: "#422006", color: "#fb923c" },
   ATIVO:      { label: "Aprovado",  bg: "#14532d", color: "#4ade80" },
@@ -36,22 +33,36 @@ function PinScreen({ onLogin }: { onLogin: () => void }) {
   const [pin, setPin] = useState("");
   const [erro, setErro] = useState(false);
   const [shake, setShake] = useState(false);
+  const [carregando, setCarregando] = useState(false);
 
-  const verificarPin = (pinDigitado: string) => {
-    const pinSalvo = localStorage.getItem(PIN_KEY) || PIN_PADRAO;
-    if (pinDigitado === pinSalvo) {
-      sessionStorage.setItem("anw_admin_logado", "1");
-      onLogin();
-    } else {
+  const verificarPin = async (pinDigitado: string) => {
+    setCarregando(true);
+    try {
+      const res = await fetch('/api/admin/pin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: pinDigitado })
+      });
+      const data = await res.json();
+      if (data.success) {
+        sessionStorage.setItem("anw_admin_logado", "1");
+        onLogin();
+      } else {
+        setErro(true);
+        setShake(true);
+        setPin("");
+        setTimeout(() => { setErro(false); setShake(false); }, 1000);
+      }
+    } catch {
       setErro(true);
-      setShake(true);
       setPin("");
-      setTimeout(() => { setErro(false); setShake(false); }, 1000);
+    } finally {
+      setCarregando(false);
     }
   };
 
   const adicionarDigito = (d: string) => {
-    if (pin.length >= 6) return;
+    if (pin.length >= 6 || carregando) return;
     const novo = pin + d;
     setPin(novo);
     if (novo.length >= 4) {
@@ -73,18 +84,19 @@ function PinScreen({ onLogin }: { onLogin: () => void }) {
         </div>
 
         <div className={`flex gap-3 ${shake ? "animate-bounce" : ""}`}>
-          {[0,1,2,3,4,5].slice(0, 4).map((i) => (
+          {[0,1,2,3].map((i) => (
             <div key={i} className="h-4 w-4 rounded-full transition-all"
               style={{ backgroundColor: i < pin.length ? (erro ? "#ef4444" : "#C0306A") : "#4A1A5C" }} />
           ))}
         </div>
 
         {erro && <p className="text-sm text-red-400">PIN incorreto!</p>}
+        {carregando && <p className="text-sm" style={{ color: "#c9a8e0" }}>Verificando...</p>}
 
         <div className="grid grid-cols-3 gap-3 w-full">
           {["1","2","3","4","5","6","7","8","9","","0","⌫"].map((d, i) => (
             <button key={i} onClick={() => d === "⌫" ? removerDigito() : d ? adicionarDigito(d) : null}
-              disabled={!d && d !== "0"}
+              disabled={(!d && d !== "0") || carregando}
               className="h-14 rounded-xl text-xl font-bold transition-all hover:opacity-80 active:scale-95 disabled:invisible"
               style={{ backgroundColor: d === "⌫" ? "#450a0a" : "#250C30", color: d === "⌫" ? "#f87171" : "#fff", border: "1px solid #4A1A5C" }}>
               {d}
@@ -102,15 +114,21 @@ function TrocarPin({ onVoltar }: { onVoltar: () => void }) {
   const [pinConfirm, setPinConfirm] = useState("");
   const [msg, setMsg] = useState<{ text: string; tipo: "ok" | "erro" } | null>(null);
 
-  const salvar = () => {
-    const pinSalvo = localStorage.getItem(PIN_KEY) || PIN_PADRAO;
-    if (pinAtual !== pinSalvo) { setMsg({ text: "PIN atual incorreto!", tipo: "erro" }); return; }
+  const salvar = async () => {
     if (pinNovo.length < 4) { setMsg({ text: "Novo PIN deve ter ao menos 4 digitos!", tipo: "erro" }); return; }
     if (pinNovo !== pinConfirm) { setMsg({ text: "PINs nao coincidem!", tipo: "erro" }); return; }
-    localStorage.setItem(PIN_KEY, pinNovo);
-    setMsg({ text: "PIN alterado com sucesso!", tipo: "ok" });
-    setPinAtual(""); setPinNovo(""); setPinConfirm("");
-    setTimeout(onVoltar, 1500);
+    const res = await fetch('/api/admin/pin', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pinAtual, pinNovo })
+    });
+    const data = await res.json();
+    if (data.success) {
+      setMsg({ text: "Novo PIN: " + pinNovo + " — Atualize ADMIN_PIN no Vercel para salvar permanentemente!", tipo: "ok" });
+      setPinAtual(""); setPinNovo(""); setPinConfirm("");
+    } else {
+      setMsg({ text: data.error || "Erro ao trocar PIN", tipo: "erro" });
+    }
   };
 
   const inputCls = "rounded-lg px-4 py-3 text-white text-sm outline-none w-full";
@@ -209,10 +227,10 @@ export default function PainelAdmin() {
   const visiveis = filtro === 'todos' ? anuncios : anuncios.filter(a => a.status === filtro);
 
   const metricaCards = [
-    { label: "Total",     valor: stats.total,     icone: Eye,         cor: "#a78bfa" },
-    { label: "Pendentes", valor: stats.pendentes,  icone: Clock,       cor: "#fb923c" },
-    { label: "Aprovados", valor: stats.aprovados,  icone: CheckCircle, cor: "#4ade80" },
-    { label: "Rejeitados",valor: stats.rejeitados, icone: XCircle,     cor: "#f87171" },
+    { label: "Total",      valor: stats.total,      icone: Eye,         cor: "#a78bfa" },
+    { label: "Pendentes",  valor: stats.pendentes,   icone: Clock,       cor: "#fb923c" },
+    { label: "Aprovados",  valor: stats.aprovados,   icone: CheckCircle, cor: "#4ade80" },
+    { label: "Rejeitados", valor: stats.rejeitados,  icone: XCircle,     cor: "#f87171" },
   ];
 
   return (
@@ -225,7 +243,7 @@ export default function PainelAdmin() {
             <p className="text-sm mt-0.5" style={{ color: "#c9a8e0" }}>Moderacao de anuncios</p>
           </div>
           <div className="flex gap-2">
-            <button onClick={() => setAba("configuracoes")}
+            <button onClick={() => setAba(aba === "configuracoes" ? "anuncios" : "configuracoes")}
               className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold transition-opacity hover:opacity-80"
               style={{ backgroundColor: aba === "configuracoes" ? "#C0306A" : "#250C30", color: "#fff", border: "1px solid #4A1A5C" }}>
               <Settings size={15} /> Config
@@ -262,10 +280,10 @@ export default function PainelAdmin() {
 
             <div className="flex flex-wrap gap-2">
               {[
-                { id: "todos", label: "Todos" },
+                { id: "todos",      label: "Todos" },
                 { id: "EM_ANALISE", label: "Pendentes" },
-                { id: "ATIVO", label: "Aprovados" },
-                { id: "REMOVIDO", label: "Rejeitados" },
+                { id: "ATIVO",      label: "Aprovados" },
+                { id: "REMOVIDO",   label: "Rejeitados" },
               ].map(({ id, label }) => (
                 <button key={id} onClick={() => setFiltro(id as any)}
                   className="rounded-lg px-4 py-1.5 text-sm font-semibold transition-colors"
