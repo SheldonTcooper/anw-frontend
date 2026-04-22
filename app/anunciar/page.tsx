@@ -1,6 +1,10 @@
 "use client";
 import { useState, useRef } from "react";
 import { Upload, X } from "lucide-react";
+import { generateUploadButton } from "@uploadthing/react";
+import type { OurFileRouter } from "../api/uploadthing/route";
+
+const UploadButton = generateUploadButton<OurFileRouter>();
 
 const estados = [
   "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA",
@@ -76,7 +80,7 @@ export default function AnunciarPage() {
   const [bairro, setBairro] = useState("");
   const [servicos, setServicos] = useState<string[]>([]);
   const [biotipos, setBiotipos] = useState<string[]>([]);
-  const [fotos, setFotos] = useState<File[]>([]);
+  const [fotosUrls, setFotosUrls] = useState<string[]>([]);
   const [telefone, setTelefone] = useState("");
   const [telefoneConf, setTelefoneConf] = useState("");
   const [titulo, setTitulo] = useState("");
@@ -84,15 +88,6 @@ export default function AnunciarPage() {
   const [dataNascimento, setDataNascimento] = useState("");
   const [cache, setCache] = useState("");
   const [loading, setLoading] = useState(false);
-  const inputFotoRef = useRef<HTMLInputElement>(null);
-
-  const handleFotos = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-    const novas = Array.from(e.target.files);
-    setFotos((prev) => [...prev, ...novas].slice(0, 10));
-  };
-
-  const removerFoto = (idx: number) => setFotos((prev) => prev.filter((_, i) => i !== idx));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,7 +105,7 @@ export default function AnunciarPage() {
           whatsapp: telefone.replace(/\D/g, ''),
           cache: cache ? parseFloat(cache) : null,
           dataNascimento: dataNascimento || null,
-          servicos, biotipos,
+          servicos, biotipos, fotosUrls,
         })
       });
       const data = await res.json();
@@ -142,25 +137,21 @@ export default function AnunciarPage() {
                   value={titulo} onChange={(e) => setTitulo(e.target.value)}
                   className={inputCls} style={inputStyle} required />
               </Campo>
-
               <Campo label="Data de nascimento">
                 <input type="date" value={dataNascimento} onChange={(e) => setDataNascimento(e.target.value)}
                   className={inputCls} style={inputStyle} required />
               </Campo>
-
               <Campo label="Valor por hora (R$)">
                 <input type="number" placeholder="Ex: 200" value={cache}
                   onChange={(e) => setCache(e.target.value)}
                   className={inputCls} style={inputStyle} min="0" />
               </Campo>
-
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <Campo label="Cidade">
                   <input type="text" placeholder="Ex: Fortaleza"
                     value={cidade} onChange={(e) => setCidade(e.target.value)}
                     className={inputCls} style={inputStyle} required />
                 </Campo>
-
                 <Campo label="Estado">
                   <select value={estado} onChange={(e) => setEstado(e.target.value)}
                     className={inputCls} style={inputStyle} required>
@@ -170,14 +161,12 @@ export default function AnunciarPage() {
                     ))}
                   </select>
                 </Campo>
-
                 <Campo label="Bairro">
                   <input type="text" placeholder="Ex: Meireles"
                     value={bairro} onChange={(e) => setBairro(e.target.value)}
                     className={inputCls} style={inputStyle} />
                 </Campo>
               </div>
-
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Campo label="Telefone / WhatsApp">
                   <input type="tel" value={telefone} onChange={(e) => setTelefone(e.target.value)}
@@ -193,7 +182,6 @@ export default function AnunciarPage() {
                   )}
                 </Campo>
               </div>
-
               <Campo label="Descricao">
                 <textarea placeholder="Fale um pouco sobre voce, o que oferece, como e seu atendimento..."
                   rows={5} value={descricao} onChange={(e) => setDescricao(e.target.value)}
@@ -212,20 +200,31 @@ export default function AnunciarPage() {
 
           <Secao titulo="Fotos (max. 10)">
             <div className="flex flex-col gap-4">
-              <button type="button" onClick={() => inputFotoRef.current?.click()}
-                className="flex w-full flex-col items-center justify-center gap-2 rounded-xl py-8"
-                style={{ border: "2px dashed #4A1A5C", backgroundColor: "#1A0A1E", color: "#c9a8e0" }}>
-                <Upload size={28} />
-                <span className="text-sm">Clique para selecionar fotos</span>
-                <span className="text-xs opacity-60">JPG, PNG, WEBP - ate 10 fotos</span>
-              </button>
-              <input ref={inputFotoRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFotos} />
-              {fotos.length > 0 && (
+              <p className="text-sm" style={{ color: "#c9a8e0" }}>
+                Suas fotos terao a marca dagua do AcompanhantesNaWeb automaticamente.
+              </p>
+              <UploadButton
+                endpoint="imageUploader"
+                onClientUploadComplete={(res) => {
+                  if (res) {
+                    const urls = res.map((r) => r.url);
+                    setFotosUrls(prev => [...prev, ...urls].slice(0, 10));
+                    alert("Fotos enviadas com sucesso!");
+                  }
+                }}
+                onUploadError={(error) => {
+                  alert("Erro no upload: " + error.message);
+                }}
+                appearance={{
+                  button: { backgroundColor: "#C0306A", color: "white", fontWeight: "bold" },
+                }}
+              />
+              {fotosUrls.length > 0 && (
                 <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
-                  {fotos.map((foto, idx) => (
+                  {fotosUrls.map((url, idx) => (
                     <div key={idx} className="relative overflow-hidden rounded-lg" style={{ paddingBottom: "133%" }}>
-                      <img src={URL.createObjectURL(foto)} alt={"foto-" + (idx + 1)} className="absolute inset-0 h-full w-full object-cover" />
-                      <button type="button" onClick={() => removerFoto(idx)}
+                      <img src={url} alt={"foto-" + (idx + 1)} className="absolute inset-0 h-full w-full object-cover" />
+                      <button type="button" onClick={() => setFotosUrls(prev => prev.filter((_, i) => i !== idx))}
                         className="absolute right-1 top-1 rounded-full p-0.5" style={{ backgroundColor: "rgba(0,0,0,0.6)" }}>
                         <X size={14} stroke="#fff" />
                       </button>
