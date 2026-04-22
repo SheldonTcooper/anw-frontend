@@ -15,6 +15,7 @@ export async function POST(request) {
     const { prisma } = await import('../../../../lib/prisma')
     const body = await request.json()
     const { titulo, descricao, cidade, estado, bairro, whatsapp, cache, dataNascimento, fotosUrls } = body
+console.log("DEBUG fotosUrls:", JSON.stringify(fotosUrls))
     const slug = titulo.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').trim() + '-' + Date.now()
     const email = whatsapp + "@anw.temp.br"
     let usuario = await prisma.usuarios.findUnique({ where: { email } })
