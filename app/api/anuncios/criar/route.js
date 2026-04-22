@@ -1,4 +1,3 @@
-$content = @'
 export const dynamic = 'force-dynamic'
 
 async function notificarTelegram(anuncio) {
@@ -36,5 +35,3 @@ export async function POST(request) {
     return Response.json({ success: false, error: error.message }, { status: 500 })
   }
 }
-'@
-Set-Content -Path "app/api/anuncios/criar/route.js" -Value $content
