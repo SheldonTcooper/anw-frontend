@@ -79,7 +79,6 @@ export async function POST(request) {
             anuncioId: anuncio.id,
             tipo: "FOTO",
             url: fotosUrls[i],
-            ordem: i,
             atualizadoEm: new Date(),
           }
         })
