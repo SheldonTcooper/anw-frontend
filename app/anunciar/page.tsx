@@ -1,26 +1,14 @@
 "use client";
 import { useState, useRef } from "react";
-import { Upload, X } from "lucide-react";
+import { X } from "lucide-react";
 import { generateUploadButton } from "@uploadthing/react";
 import type { OurFileRouter } from "../api/uploadthing/route";
 
 const UploadButton = generateUploadButton<OurFileRouter>();
 
-const estados = [
-  "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA",
-  "MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN",
-  "RS","RO","RR","SC","SP","SE","TO"
-];
-
-const servicosOpcoes = [
-  "Beijo na boca","Oral sem camisinha","Anal","Dupla penetracao",
-  "Completa","Garganta profunda","Gozo na boca","Pernoite",
-  "24h","Com local","Aceita cartao","Liberal","Mostra rosto","Tem videos",
-];
-
-const biotiposOpcoes = [
-  "Baixinha","Gordinha","Modelo","Cavala","Ninfeta","Peitosa",
-];
+const estados = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
+const servicosOpcoes = ["Beijo na boca","Oral sem camisinha","Anal","Dupla penetracao","Completa","Garganta profunda","Gozo na boca","Pernoite","24h","Com local","Aceita cartao","Liberal","Mostra rosto","Tem videos"];
+const biotiposOpcoes = ["Baixinha","Gordinha","Modelo","Cavala","Ninfeta","Peitosa"];
 
 function Secao({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
@@ -43,13 +31,8 @@ function Campo({ label, children }: { label: string; children: React.ReactNode }
 const inputCls = "rounded-lg px-4 py-3 text-sm text-white placeholder-gray-500 outline-none focus:ring-1 focus:ring-[#C0306A] w-full";
 const inputStyle = { backgroundColor: "#1A0A1E", border: "1px solid #4A1A5C" };
 
-function CheckGrid({ opcoes, selecionados, onChange }: {
-  opcoes: string[];
-  selecionados: string[];
-  onChange: (v: string[]) => void;
-}) {
-  const toggle = (op: string) =>
-    onChange(selecionados.includes(op) ? selecionados.filter((s) => s !== op) : [...selecionados, op]);
+function CheckGrid({ opcoes, selecionados, onChange }: { opcoes: string[]; selecionados: string[]; onChange: (v: string[]) => void }) {
+  const toggle = (op: string) => onChange(selecionados.includes(op) ? selecionados.filter((s) => s !== op) : [...selecionados, op]);
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
       {opcoes.map((op) => {
@@ -60,11 +43,7 @@ function CheckGrid({ opcoes, selecionados, onChange }: {
             <input type="checkbox" className="hidden" checked={ativo} onChange={() => toggle(op)} />
             <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded"
               style={{ backgroundColor: ativo ? "#C0306A" : "transparent", border: "1.5px solid " + (ativo ? "#C0306A" : "#4A1A5C") }}>
-              {ativo && (
-                <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                  <path d="M1 4L3.5 6.5L9 1" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              )}
+              {ativo && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>}
             </span>
             {op}
           </label>
@@ -81,6 +60,7 @@ export default function AnunciarPage() {
   const [servicos, setServicos] = useState<string[]>([]);
   const [biotipos, setBiotipos] = useState<string[]>([]);
   const [fotosUrls, setFotosUrls] = useState<string[]>([]);
+  const fotosRef = useRef<string[]>([]);
   const [telefone, setTelefone] = useState("");
   const [telefoneConf, setTelefoneConf] = useState("");
   const [titulo, setTitulo] = useState("");
@@ -91,10 +71,7 @@ export default function AnunciarPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (telefone !== telefoneConf) {
-      alert("Os telefones nao coincidem.");
-      return;
-    }
+    if (telefone !== telefoneConf) { alert("Os telefones nao coincidem."); return; }
     setLoading(true);
     try {
       const res = await fetch('/api/anuncios/criar', {
@@ -105,7 +82,8 @@ export default function AnunciarPage() {
           whatsapp: telefone.replace(/\D/g, ''),
           cache: cache ? parseFloat(cache) : null,
           dataNascimento: dataNascimento || null,
-          servicos, biotipos, fotosUrls,
+          servicos, biotipos,
+          fotosUrls: fotosRef.current,
         })
       });
       const data = await res.json();
@@ -125,67 +103,45 @@ export default function AnunciarPage() {
   return (
     <main className="min-h-screen px-4 py-8 sm:px-8" style={{ backgroundColor: "#1A0A1E" }}>
       <div className="mx-auto max-w-3xl">
-        <h1 className="mb-8 text-2xl font-bold text-white">
-          Publicar <span style={{ color: "#C0306A" }}>Anuncio</span>
-        </h1>
+        <h1 className="mb-8 text-2xl font-bold text-white">Publicar <span style={{ color: "#C0306A" }}>Anuncio</span></h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-
           <Secao titulo="Informacoes basicas">
             <div className="flex flex-col gap-4">
               <Campo label="Titulo do anuncio">
-                <input type="text" placeholder="Ex: Valentina - Fortaleza, CE"
-                  value={titulo} onChange={(e) => setTitulo(e.target.value)}
-                  className={inputCls} style={inputStyle} required />
+                <input type="text" placeholder="Ex: Valentina - Fortaleza, CE" value={titulo} onChange={(e) => setTitulo(e.target.value)} className={inputCls} style={inputStyle} required />
               </Campo>
               <Campo label="Data de nascimento">
-                <input type="date" value={dataNascimento} onChange={(e) => setDataNascimento(e.target.value)}
-                  className={inputCls} style={inputStyle} required />
+                <input type="date" value={dataNascimento} onChange={(e) => setDataNascimento(e.target.value)} className={inputCls} style={inputStyle} required />
               </Campo>
               <Campo label="Valor por hora (R$)">
-                <input type="number" placeholder="Ex: 200" value={cache}
-                  onChange={(e) => setCache(e.target.value)}
-                  className={inputCls} style={inputStyle} min="0" />
+                <input type="number" placeholder="Ex: 200" value={cache} onChange={(e) => setCache(e.target.value)} className={inputCls} style={inputStyle} min="0" />
               </Campo>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <Campo label="Cidade">
-                  <input type="text" placeholder="Ex: Fortaleza"
-                    value={cidade} onChange={(e) => setCidade(e.target.value)}
-                    className={inputCls} style={inputStyle} required />
+                  <input type="text" placeholder="Ex: Fortaleza" value={cidade} onChange={(e) => setCidade(e.target.value)} className={inputCls} style={inputStyle} required />
                 </Campo>
                 <Campo label="Estado">
-                  <select value={estado} onChange={(e) => setEstado(e.target.value)}
-                    className={inputCls} style={inputStyle} required>
+                  <select value={estado} onChange={(e) => setEstado(e.target.value)} className={inputCls} style={inputStyle} required>
                     <option value="" disabled>UF</option>
-                    {estados.map((uf) => (
-                      <option key={uf} value={uf}>{uf}</option>
-                    ))}
+                    {estados.map((uf) => <option key={uf} value={uf}>{uf}</option>)}
                   </select>
                 </Campo>
                 <Campo label="Bairro">
-                  <input type="text" placeholder="Ex: Meireles"
-                    value={bairro} onChange={(e) => setBairro(e.target.value)}
-                    className={inputCls} style={inputStyle} />
+                  <input type="text" placeholder="Ex: Meireles" value={bairro} onChange={(e) => setBairro(e.target.value)} className={inputCls} style={inputStyle} />
                 </Campo>
               </div>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Campo label="Telefone / WhatsApp">
-                  <input type="tel" value={telefone} onChange={(e) => setTelefone(e.target.value)}
-                    placeholder="(11) 99999-0000" className={inputCls} style={inputStyle} required />
+                  <input type="tel" value={telefone} onChange={(e) => setTelefone(e.target.value)} placeholder="(11) 99999-0000" className={inputCls} style={inputStyle} required />
                 </Campo>
                 <Campo label="Confirmar telefone">
-                  <input type="tel" value={telefoneConf} onChange={(e) => setTelefoneConf(e.target.value)}
-                    placeholder="(11) 99999-0000" className={inputCls}
-                    style={{ ...inputStyle, borderColor: telefoneConf && telefone !== telefoneConf ? "#ef4444" : telefoneConf && telefone === telefoneConf ? "#22c55e" : "#4A1A5C" }}
-                    required />
-                  {telefoneConf && telefone !== telefoneConf && (
-                    <span className="text-xs text-red-400">Telefones nao coincidem</span>
-                  )}
+                  <input type="tel" value={telefoneConf} onChange={(e) => setTelefoneConf(e.target.value)} placeholder="(11) 99999-0000" className={inputCls}
+                    style={{ ...inputStyle, borderColor: telefoneConf && telefone !== telefoneConf ? "#ef4444" : telefoneConf && telefone === telefoneConf ? "#22c55e" : "#4A1A5C" }} required />
+                  {telefoneConf && telefone !== telefoneConf && <span className="text-xs text-red-400">Telefones nao coincidem</span>}
                 </Campo>
               </div>
               <Campo label="Descricao">
-                <textarea placeholder="Fale um pouco sobre voce, o que oferece, como e seu atendimento..."
-                  rows={5} value={descricao} onChange={(e) => setDescricao(e.target.value)}
-                  className={inputCls} style={{ ...inputStyle, resize: "vertical" }} required />
+                <textarea placeholder="Fale um pouco sobre voce, o que oferece, como e seu atendimento..." rows={5} value={descricao} onChange={(e) => setDescricao(e.target.value)} className={inputCls} style={{ ...inputStyle, resize: "vertical" }} required />
               </Campo>
             </div>
           </Secao>
@@ -200,37 +156,34 @@ export default function AnunciarPage() {
 
           <Secao titulo="Fotos (max. 10)">
             <div className="flex flex-col gap-4">
-              <p className="text-sm" style={{ color: "#c9a8e0" }}>
-                Suas fotos terao a marca dagua do AcompanhantesNaWeb automaticamente.
-              </p>
+              <p className="text-sm" style={{ color: "#c9a8e0" }}>Suas fotos terao a marca dagua do AcompanhantesNaWeb automaticamente.</p>
               <UploadButton
                 endpoint="imageUploader"
                 onClientUploadComplete={(res) => {
                   if (res) {
                     const urls = res.map((r) => r.url);
-                    setFotosUrls(prev => [...prev, ...urls].slice(0, 10));
-                    alert("Fotos enviadas com sucesso!");
+                    const novas = [...fotosRef.current, ...urls].slice(0, 10);
+                    fotosRef.current = novas;
+                    setFotosUrls(novas);
+                    alert("Fotos enviadas! Total: " + novas.length);
                   }
                 }}
-                onUploadError={(error) => {
-                  alert("Erro no upload: " + error.message);
-                }}
-                appearance={{
-                  button: { backgroundColor: "#C0306A", color: "white", fontWeight: "bold" },
-                }}
+                onUploadError={(error) => { alert("Erro no upload: " + error.message); }}
+                appearance={{ button: { backgroundColor: "#C0306A", color: "white", fontWeight: "bold" } }}
               />
               {fotosUrls.length > 0 && (
                 <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
                   {fotosUrls.map((url, idx) => (
                     <div key={idx} className="relative overflow-hidden rounded-lg" style={{ paddingBottom: "133%" }}>
                       <img src={url} alt={"foto-" + (idx + 1)} className="absolute inset-0 h-full w-full object-cover" />
-                      <button type="button" onClick={() => setFotosUrls(prev => prev.filter((_, i) => i !== idx))}
-                        className="absolute right-1 top-1 rounded-full p-0.5" style={{ backgroundColor: "rgba(0,0,0,0.6)" }}>
+                      <button type="button" onClick={() => {
+                        const novas = fotosRef.current.filter((_, i) => i !== idx);
+                        fotosRef.current = novas;
+                        setFotosUrls(novas);
+                      }} className="absolute right-1 top-1 rounded-full p-0.5" style={{ backgroundColor: "rgba(0,0,0,0.6)" }}>
                         <X size={14} stroke="#fff" />
                       </button>
-                      {idx === 0 && (
-                        <span className="absolute bottom-1 left-1 rounded px-1.5 py-0.5 text-xs font-bold" style={{ backgroundColor: "#C0306A", color: "#fff" }}>Capa</span>
-                      )}
+                      {idx === 0 && <span className="absolute bottom-1 left-1 rounded px-1.5 py-0.5 text-xs font-bold" style={{ backgroundColor: "#C0306A", color: "#fff" }}>Capa</span>}
                     </div>
                   ))}
                 </div>
@@ -243,7 +196,6 @@ export default function AnunciarPage() {
             style={{ backgroundColor: "#C0306A" }}>
             {loading ? "Enviando..." : "Publicar Anuncio"}
           </button>
-
         </form>
       </div>
     </main>

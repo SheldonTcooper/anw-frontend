@@ -45,7 +45,6 @@ function PinScreen({ onLogin }: { onLogin: () => void }) {
       });
       const data = await res.json();
       if (data.success) {
-        sessionStorage.setItem("anw_admin_logado", "1");
         onLogin();
       } else {
         setErro(true);
@@ -82,17 +81,14 @@ function PinScreen({ onLogin }: { onLogin: () => void }) {
           <h1 className="text-2xl font-bold text-white">Painel Admin</h1>
           <p className="text-sm" style={{ color: "#c9a8e0" }}>Digite o PIN de acesso</p>
         </div>
-
         <div className={`flex gap-3 ${shake ? "animate-bounce" : ""}`}>
           {[0,1,2,3].map((i) => (
             <div key={i} className="h-4 w-4 rounded-full transition-all"
               style={{ backgroundColor: i < pin.length ? (erro ? "#ef4444" : "#C0306A") : "#4A1A5C" }} />
           ))}
         </div>
-
         {erro && <p className="text-sm text-red-400">PIN incorreto!</p>}
         {carregando && <p className="text-sm" style={{ color: "#c9a8e0" }}>Verificando...</p>}
-
         <div className="grid grid-cols-3 gap-3 w-full">
           {["1","2","3","4","5","6","7","8","9","","0","⌫"].map((d, i) => (
             <button key={i} onClick={() => d === "⌫" ? removerDigito() : d ? adicionarDigito(d) : null}
@@ -142,31 +138,22 @@ function TrocarPin({ onVoltar }: { onVoltar: () => void }) {
       </div>
       <div className="flex flex-col gap-1">
         <label className="text-sm" style={{ color: "#c9a8e0" }}>PIN atual</label>
-        <input type="password" maxLength={8} value={pinAtual} onChange={e => setPinAtual(e.target.value)}
-          placeholder="Digite o PIN atual" className={inputCls} style={inputStyle} />
+        <input type="password" maxLength={8} value={pinAtual} onChange={e => setPinAtual(e.target.value)} placeholder="Digite o PIN atual" className={inputCls} style={inputStyle} />
       </div>
       <div className="flex flex-col gap-1">
         <label className="text-sm" style={{ color: "#c9a8e0" }}>Novo PIN</label>
-        <input type="password" maxLength={8} value={pinNovo} onChange={e => setPinNovo(e.target.value)}
-          placeholder="Digite o novo PIN" className={inputCls} style={inputStyle} />
+        <input type="password" maxLength={8} value={pinNovo} onChange={e => setPinNovo(e.target.value)} placeholder="Digite o novo PIN" className={inputCls} style={inputStyle} />
       </div>
       <div className="flex flex-col gap-1">
         <label className="text-sm" style={{ color: "#c9a8e0" }}>Confirmar novo PIN</label>
-        <input type="password" maxLength={8} value={pinConfirm} onChange={e => setPinConfirm(e.target.value)}
-          placeholder="Confirme o novo PIN" className={inputCls} style={inputStyle} />
+        <input type="password" maxLength={8} value={pinConfirm} onChange={e => setPinConfirm(e.target.value)} placeholder="Confirme o novo PIN" className={inputCls} style={inputStyle} />
       </div>
-      {msg && (
-        <p className="text-sm" style={{ color: msg.tipo === "ok" ? "#4ade80" : "#f87171" }}>{msg.text}</p>
-      )}
+      {msg && <p className="text-sm" style={{ color: msg.tipo === "ok" ? "#4ade80" : "#f87171" }}>{msg.text}</p>}
       <div className="flex gap-3">
         <button onClick={onVoltar} className="flex-1 rounded-lg py-3 text-sm font-bold"
-          style={{ backgroundColor: "transparent", border: "1px solid #4A1A5C", color: "#c9a8e0" }}>
-          Cancelar
-        </button>
+          style={{ backgroundColor: "transparent", border: "1px solid #4A1A5C", color: "#c9a8e0" }}>Cancelar</button>
         <button onClick={salvar} className="flex-1 rounded-lg py-3 text-sm font-bold text-white hover:opacity-90"
-          style={{ backgroundColor: "#C0306A" }}>
-          Salvar PIN
-        </button>
+          style={{ backgroundColor: "#C0306A" }}>Salvar PIN</button>
       </div>
     </div>
   );
@@ -178,11 +165,6 @@ export default function PainelAdmin() {
   const [loading, setLoading] = useState(true);
   const [filtro, setFiltro] = useState<"todos" | Status>("todos");
   const [aba, setAba] = useState<"anuncios" | "configuracoes">("anuncios");
-
-  useEffect(() => {
-    const sessao = sessionStorage.getItem("anw_admin_logado");
-    if (sessao === "1") setLogado(true);
-  }, []);
 
   useEffect(() => {
     if (logado) carregarAnuncios();
@@ -198,10 +180,7 @@ export default function PainelAdmin() {
     finally { setLoading(false); }
   };
 
-  const sair = () => {
-    sessionStorage.removeItem("anw_admin_logado");
-    setLogado(false);
-  };
+  const sair = () => setLogado(false);
 
   const atualizarStatus = async (id: string, status: Status) => {
     try {
@@ -236,7 +215,6 @@ export default function PainelAdmin() {
   return (
     <main className="min-h-screen px-4 py-8 sm:px-8" style={{ backgroundColor: "#1A0A1E" }}>
       <div className="mx-auto max-w-5xl flex flex-col gap-6">
-
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-white">Painel Administrativo</h1>
@@ -257,9 +235,7 @@ export default function PainelAdmin() {
         </div>
 
         {aba === "configuracoes" ? (
-          <Card>
-            <TrocarPin onVoltar={() => setAba("anuncios")} />
-          </Card>
+          <Card><TrocarPin onVoltar={() => setAba("anuncios")} /></Card>
         ) : (
           <>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -280,16 +256,14 @@ export default function PainelAdmin() {
 
             <div className="flex flex-wrap gap-2">
               {[
-                { id: "todos",      label: "Todos" },
+                { id: "todos", label: "Todos" },
                 { id: "EM_ANALISE", label: "Pendentes" },
-                { id: "ATIVO",      label: "Aprovados" },
-                { id: "REMOVIDO",   label: "Rejeitados" },
+                { id: "ATIVO", label: "Aprovados" },
+                { id: "REMOVIDO", label: "Rejeitados" },
               ].map(({ id, label }) => (
                 <button key={id} onClick={() => setFiltro(id as any)}
                   className="rounded-lg px-4 py-1.5 text-sm font-semibold transition-colors"
-                  style={filtro === id
-                    ? { backgroundColor: "#C0306A", color: "#fff" }
-                    : { backgroundColor: "#250C30", color: "#c9a8e0", border: "1px solid #4A1A5C" }}>
+                  style={filtro === id ? { backgroundColor: "#C0306A", color: "#fff" } : { backgroundColor: "#250C30", color: "#c9a8e0", border: "1px solid #4A1A5C" }}>
                   {label}
                 </button>
               ))}
@@ -317,16 +291,10 @@ export default function PainelAdmin() {
                             <td className="px-4 py-3 font-medium text-white whitespace-nowrap">{a.titulo}</td>
                             <td className="px-4 py-3 whitespace-nowrap" style={{ color: "#c9a8e0" }}>{a.cidade} - {a.estado}</td>
                             <td className="px-4 py-3 whitespace-nowrap" style={{ color: "#c9a8e0" }}>{a.whatsapp}</td>
-                            <td className="px-4 py-3 whitespace-nowrap" style={{ color: "#c9a8e0" }}>
-                              {a.cache ? "R$ " + Number(a.cache).toFixed(0) : '-'}
-                            </td>
-                            <td className="px-4 py-3 whitespace-nowrap" style={{ color: "#c9a8e0" }}>
-                              {new Date(a.criadoEm).toLocaleDateString('pt-BR')}
-                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap" style={{ color: "#c9a8e0" }}>{a.cache ? "R$ " + Number(a.cache).toFixed(0) : '-'}</td>
+                            <td className="px-4 py-3 whitespace-nowrap" style={{ color: "#c9a8e0" }}>{new Date(a.criadoEm).toLocaleDateString('pt-BR')}</td>
                             <td className="px-4 py-3">
-                              <span className="rounded-full px-2.5 py-0.5 text-xs font-bold uppercase" style={{ backgroundColor: badge.bg, color: badge.color }}>
-                                {badge.label}
-                              </span>
+                              <span className="rounded-full px-2.5 py-0.5 text-xs font-bold uppercase" style={{ backgroundColor: badge.bg, color: badge.color }}>{badge.label}</span>
                             </td>
                             <td className="px-4 py-3">
                               <div className="flex items-center gap-2">
