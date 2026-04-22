@@ -60,6 +60,7 @@ export default function AnunciarPage() {
   const [servicos, setServicos] = useState<string[]>([]);
   const [biotipos, setBiotipos] = useState<string[]>([]);
   const [fotosUrls, setFotosUrls] = useState<string[]>([]);
+  const [capaIdx, setCapaIdx] = useState(0);
   const fotosRef = useRef<string[]>([]);
   const [telefone, setTelefone] = useState("");
   const [telefoneConf, setTelefoneConf] = useState("");
@@ -74,6 +75,12 @@ export default function AnunciarPage() {
     if (telefone !== telefoneConf) { alert("Os telefones nao coincidem."); return; }
     setLoading(true);
     try {
+      // Reordenar fotos para que a capa seja sempre a primeira
+      const fotosOrdenadas = [...fotosRef.current];
+      if (capaIdx > 0) {
+        const capa = fotosOrdenadas.splice(capaIdx, 1)[0];
+        fotosOrdenadas.unshift(capa);
+      }
       const res = await fetch('/api/anuncios/criar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -83,7 +90,7 @@ export default function AnunciarPage() {
           cache: cache ? parseFloat(cache) : null,
           dataNascimento: dataNascimento || null,
           servicos, biotipos,
-          fotosUrls: fotosRef.current,
+          fotosUrls: fotosOrdenadas,
         })
       });
       const data = await res.json();
@@ -156,12 +163,14 @@ export default function AnunciarPage() {
 
           <Secao titulo="Fotos (max. 10)">
             <div className="flex flex-col gap-4">
-              <p className="text-sm" style={{ color: "#c9a8e0" }}>Suas fotos terao a marca dagua do AcompanhantesNaWeb automaticamente.</p>
+              <p className="text-sm" style={{ color: "#c9a8e0" }}>
+                Clique em uma foto para defini-la como <strong style={{ color: "#C0306A" }}>CAPA</strong>. Suas fotos terao a marca dagua automaticamente.
+              </p>
               <UploadButton
                 endpoint="imageUploader"
                 onClientUploadComplete={(res) => {
                   if (res) {
-                    const urls = res.map((r) => r.url);
+                    const urls = res.map((r) => (r as any).ufsUrl || r.url);
                     const novas = [...fotosRef.current, ...urls].slice(0, 10);
                     fotosRef.current = novas;
                     setFotosUrls(novas);
@@ -172,20 +181,29 @@ export default function AnunciarPage() {
                 appearance={{ button: { backgroundColor: "#C0306A", color: "white", fontWeight: "bold" } }}
               />
               {fotosUrls.length > 0 && (
-                <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
-                  {fotosUrls.map((url, idx) => (
-                    <div key={idx} className="relative overflow-hidden rounded-lg" style={{ paddingBottom: "133%" }}>
-                      <img src={url} alt={"foto-" + (idx + 1)} className="absolute inset-0 h-full w-full object-cover" />
-                      <button type="button" onClick={() => {
-                        const novas = fotosRef.current.filter((_, i) => i !== idx);
-                        fotosRef.current = novas;
-                        setFotosUrls(novas);
-                      }} className="absolute right-1 top-1 rounded-full p-0.5" style={{ backgroundColor: "rgba(0,0,0,0.6)" }}>
-                        <X size={14} stroke="#fff" />
-                      </button>
-                      {idx === 0 && <span className="absolute bottom-1 left-1 rounded px-1.5 py-0.5 text-xs font-bold" style={{ backgroundColor: "#C0306A", color: "#fff" }}>Capa</span>}
-                    </div>
-                  ))}
+                <div className="flex flex-col gap-2">
+                  <p className="text-xs" style={{ color: "#c9a8e0" }}>Clique na foto para definir como capa:</p>
+                  <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
+                    {fotosUrls.map((url, idx) => (
+                      <div key={idx} className="relative overflow-hidden rounded-lg cursor-pointer"
+                        style={{ paddingBottom: "133%", border: idx === capaIdx ? "3px solid #C0306A" : "3px solid transparent" }}
+                        onClick={() => setCapaIdx(idx)}>
+                        <img src={url} alt={"foto-" + (idx + 1)} className="absolute inset-0 h-full w-full object-cover" />
+                        {idx === capaIdx && (
+                          <span className="absolute bottom-1 left-1 rounded px-1.5 py-0.5 text-xs font-bold" style={{ backgroundColor: "#C0306A", color: "#fff" }}>CAPA</span>
+                        )}
+                        <button type="button" onClick={(e) => {
+                          e.stopPropagation();
+                          const novas = fotosRef.current.filter((_, i) => i !== idx);
+                          fotosRef.current = novas;
+                          setFotosUrls(novas);
+                          if (capaIdx >= novas.length) setCapaIdx(0);
+                        }} className="absolute right-1 top-1 rounded-full p-0.5" style={{ backgroundColor: "rgba(0,0,0,0.6)" }}>
+                          <X size={14} stroke="#fff" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
