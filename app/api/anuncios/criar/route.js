@@ -1,10 +1,31 @@
 export const dynamic = 'force-dynamic'
 
+async function notificarTelegram(anuncio) {
+  try {
+    const token = process.env.TELEGRAM_BOT_TOKEN
+    const chatId = process.env.TELEGRAM_CHAT_ID
+    if (!token || !chatId) return
+    const mensagem = "🔔 Novo anuncio pendente!\n\n" +
+      "Nome: " + anuncio.titulo + "\n" +
+      "Cidade: " + anuncio.cidade + " - " + anuncio.estado + "\n" +
+      "WhatsApp: " + anuncio.whatsapp + "\n" +
+      "Valor: R$ " + (anuncio.cache || "nao informado") + "/hora\n\n" +
+      "Acesse o painel:\nhttps://www.acompanhantesnaweb.com.br/admin"
+    await fetch("https://api.telegram.org/bot" + token + "/sendMessage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, text: mensagem })
+    })
+  } catch (err) {
+    console.error("Erro Telegram:", err)
+  }
+}
+
 export async function POST(request) {
   try {
     const { prisma } = await import('../../../../lib/prisma')
     const body = await request.json()
-    const { titulo, descricao, cidade, estado, bairro, whatsapp, cache, dataNascimento } = body
+    const { titulo, descricao, cidade, estado, bairro, whatsapp, cache, dataNascimento, servicos, biotipos, fotosUrls } = body
 
     const slug = titulo
       .toLowerCase()
@@ -14,13 +35,13 @@ export async function POST(request) {
       .replace(/\s+/g, '-')
       .trim() + '-' + Date.now()
 
-    const email = `${whatsapp}@anw.temp.br`
+    const email = whatsapp + "@anw.temp.br"
     let usuario = await prisma.usuarios.findUnique({ where: { email } })
 
     if (!usuario) {
       usuario = await prisma.usuarios.create({
         data: {
-          id: `usr_${Date.now()}`,
+          id: "usr_" + Date.now(),
           email,
           senhaHash: 'temp',
           nome: titulo,
@@ -32,7 +53,7 @@ export async function POST(request) {
 
     const anuncio = await prisma.anuncios.create({
       data: {
-        id: `anuncio_${Date.now()}`,
+        id: "anuncio_" + Date.now(),
         usuarioId: usuario.id,
         titulo,
         slug,
@@ -48,6 +69,24 @@ export async function POST(request) {
         atualizadoEm: new Date(),
       }
     })
+
+    // Salvar fotos no banco
+    if (fotosUrls && fotosUrls.length > 0) {
+      for (let i = 0; i < fotosUrls.length; i++) {
+        await prisma.midias.create({
+          data: {
+            id: "midia_" + Date.now() + "_" + i,
+            anuncioId: anuncio.id,
+            tipo: "FOTO",
+            url: fotosUrls[i],
+            ordem: i,
+            atualizadoEm: new Date(),
+          }
+        })
+      }
+    }
+
+    await notificarTelegram(anuncio)
 
     return Response.json({ success: true, slug: anuncio.slug, id: anuncio.id })
   } catch (error) {
