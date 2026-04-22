@@ -26,9 +26,15 @@ console.log("DEBUG fotosUrls:", JSON.stringify(fotosUrls))
       data: { id: "anuncio_" + Date.now(), usuarioId: usuario.id, titulo, slug, descricao, cidade, estado: estado || 'BR', bairro, whatsapp: whatsapp?.replace(/\D/g, ''), cache: cache ? parseFloat(cache) : null, dataNascimento: dataNascimento ? new Date(dataNascimento) : null, plano: 'ORGANICO', status: 'EM_ANALISE', atualizadoEm: new Date() }
     })
     if (fotosUrls && fotosUrls.length > 0) {
-      for (let i = 0; i < fotosUrls.length; i++) {
-        await prisma.midias.create({ data: { id: "midia_" + Date.now() + "_" + i, anuncioId: anuncio.id, tipo: "FOTO", url: fotosUrls[i], ordem: i } })
-      }
+      await prisma.midias.createMany({
+        data: fotosUrls.map((url, i) => ({
+          id: "midia_" + Date.now() + "_" + i,
+          anuncioId: anuncio.id,
+          tipo: "FOTO",
+          url: url,
+          ordem: i,
+        }))
+      })
     }
     await notificarTelegram(anuncio)
     return Response.json({ success: true, slug: anuncio.slug, id: anuncio.id })
