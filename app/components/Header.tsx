@@ -72,6 +72,10 @@ export default function Header() {
                   style={{ backgroundColor: "#C0306A" }}>
                   Publicar
                 </a>
+                <a href="/admin" className="rounded-lg px-3 py-2 text-xs font-bold uppercase text-white hover:opacity-90"
+                  style={{ backgroundColor: "#1A0A1E", border: "1px solid #4A1A5C" }}>
+                  Admin
+                </a>
               </>
             )}
           </div>
@@ -136,3 +140,4 @@ export default function Header() {
     </header>
   );
 }
+
