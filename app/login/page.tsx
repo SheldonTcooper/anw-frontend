@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState } from "react";
 import { Eye, EyeOff, User, Megaphone } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -36,7 +36,8 @@ export default function LoginPage() {
         if (!res.ok) throw new Error(data.error || "Erro ao fazer login");
         document.cookie = "token=" + data.token + "; path=/; max-age=" + (60 * 60 * 24 * 7);
         localStorage.setItem("usuario", JSON.stringify(data.usuario));
-        if (data.usuario.tipo === "ANUNCIANTE") router.push("/painel");
+        if (data.usuario.tipo === "ADMIN") router.push("/admin");
+        else if (data.usuario.tipo === "ANUNCIANTE") router.push("/painel");
         else router.push("/");
       } else {
         const res = await fetch('/api/auth/registro', {
@@ -48,7 +49,8 @@ export default function LoginPage() {
         if (!res.ok) throw new Error(data.error || "Erro ao criar conta");
         document.cookie = "token=" + data.token + "; path=/; max-age=" + (60 * 60 * 24 * 7);
         localStorage.setItem("usuario", JSON.stringify(data.usuario));
-        if (data.usuario.tipo === "ANUNCIANTE") router.push("/como-funciona");
+        if (data.usuario.tipo === "ADMIN") router.push("/admin");
+        else if (data.usuario.tipo === "ANUNCIANTE") router.push("/como-funciona");
         else router.push("/");
       }
     } catch (err: any) {
@@ -149,7 +151,7 @@ export default function LoginPage() {
 
           <div className="mt-6 text-center">
             <a href="/" className="text-sm hover:underline" style={{ color: "#c9a8e0" }}>
-              ← Voltar ao site sem entrar
+              â† Voltar ao site sem entrar
             </a>
           </div>
         </div>
@@ -157,3 +159,4 @@ export default function LoginPage() {
     </main>
   );
 }
+
