@@ -23,7 +23,13 @@ export default function AvisoMaioridade() {
   const confirmarMaioridade = () => {
     try {
       const usuario = localStorage.getItem("usuario");
-      if (!usuario) router.push("/login");
+      if (usuario) {
+        // Já logado — só fecha o aviso recarregando
+        const el = document.getElementById("aviso-maioridade");
+        if (el) el.style.display = "none";
+      } else {
+        router.push("/login");
+      }
     } catch {
       router.push("/login");
     }
@@ -34,7 +40,7 @@ export default function AvisoMaioridade() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4"
+    <div id="aviso-maioridade" className="fixed inset-0 z-50 flex items-center justify-center px-4"
       style={{ backgroundColor: "rgba(0,0,0,0.95)", backdropFilter: "blur(8px)" }}>
       <div className="w-full max-w-sm rounded-2xl p-8 text-center"
         style={{ backgroundColor: "#250C30", border: "2px solid #C0306A" }}>
