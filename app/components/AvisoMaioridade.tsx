@@ -1,7 +1,17 @@
 "use client";
 import { useRouter, usePathname } from "next/navigation";
 
-const paginasLivres = ["/admin", "/login", "/termos-de-uso", "/privacidade", "/como-funciona"];
+const paginasLivres = [
+  "/admin",
+  "/login",
+  "/termos-de-uso",
+  "/privacidade",
+  "/como-funciona",
+  "/painel",
+  "/anunciar",
+  "/acompanhantes",
+  "/cliente",
+];
 
 export default function AvisoMaioridade() {
   const router = useRouter();
