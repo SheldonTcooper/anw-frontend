@@ -1,18 +1,11 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
 import { Check, X, Eye, Clock, CheckCircle, XCircle, Lock, Settings, LogOut, Key } from "lucide-react";
 
 type Status = "EM_ANALISE" | "ATIVO" | "REMOVIDO";
 interface Anuncio {
-  id: string;
-  titulo: string;
-  cidade: string;
-  estado: string;
-  whatsapp: string;
-  cache: number | null;
-  status: Status;
-  criadoEm: string;
-  slug: string;
+  id: string; titulo: string; cidade: string; estado: string;
+  whatsapp: string; cache: number | null; status: Status; criadoEm: string; slug: string;
 }
 
 const badgeStatus: Record<Status, { label: string; bg: string; color: string }> = {
@@ -29,7 +22,7 @@ function Card({ children, className = "" }: { children: React.ReactNode; classNa
   );
 }
 
-function PinScreen({ onLogin }: { onLogin: () => void }) {
+function PinScreen({ onLogin }: { onLogin: (pin: string) => void }) {
   const [pin, setPin] = useState("");
   const [erro, setErro] = useState(false);
   const [shake, setShake] = useState(false);
@@ -45,16 +38,13 @@ function PinScreen({ onLogin }: { onLogin: () => void }) {
       });
       const data = await res.json();
       if (data.success) {
-        onLogin();
+        onLogin(pinDigitado);
       } else {
-        setErro(true);
-        setShake(true);
-        setPin("");
+        setErro(true); setShake(true); setPin("");
         setTimeout(() => { setErro(false); setShake(false); }, 1000);
       }
     } catch {
-      setErro(true);
-      setPin("");
+      setErro(true); setPin("");
     } finally {
       setCarregando(false);
     }
@@ -64,9 +54,7 @@ function PinScreen({ onLogin }: { onLogin: () => void }) {
     if (pin.length >= 6 || carregando) return;
     const novo = pin + d;
     setPin(novo);
-    if (novo.length >= 4) {
-      setTimeout(() => verificarPin(novo), 200);
-    }
+    if (novo.length >= 4) setTimeout(() => verificarPin(novo), 200);
   };
 
   const removerDigito = () => setPin(p => p.slice(0, -1));
@@ -104,7 +92,7 @@ function PinScreen({ onLogin }: { onLogin: () => void }) {
   );
 }
 
-function TrocarPin({ onVoltar }: { onVoltar: () => void }) {
+function TrocarPin({ pin, onVoltar }: { pin: string; onVoltar: () => void }) {
   const [pinAtual, setPinAtual] = useState("");
   const [pinNovo, setPinNovo] = useState("");
   const [pinConfirm, setPinConfirm] = useState("");
@@ -115,12 +103,12 @@ function TrocarPin({ onVoltar }: { onVoltar: () => void }) {
     if (pinNovo !== pinConfirm) { setMsg({ text: "PINs nao coincidem!", tipo: "erro" }); return; }
     const res = await fetch('/api/admin/pin', {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-admin-pin': pin },
       body: JSON.stringify({ pinAtual, pinNovo })
     });
     const data = await res.json();
     if (data.success) {
-      setMsg({ text: "Novo PIN: " + pinNovo + " — Atualize ADMIN_PIN no Vercel para salvar permanentemente!", tipo: "ok" });
+      setMsg({ text: "Atualize ADMIN_PIN no Vercel para salvar permanentemente!", tipo: "ok" });
       setPinAtual(""); setPinNovo(""); setPinConfirm("");
     } else {
       setMsg({ text: data.error || "Erro ao trocar PIN", tipo: "erro" });
@@ -161,32 +149,35 @@ function TrocarPin({ onVoltar }: { onVoltar: () => void }) {
 
 export default function PainelAdmin() {
   const [logado, setLogado] = useState(false);
+  const [pinSessao, setPinSessao] = useState("");
   const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
   const [loading, setLoading] = useState(true);
   const [filtro, setFiltro] = useState<"todos" | Status>("todos");
   const [aba, setAba] = useState<"anuncios" | "configuracoes">("anuncios");
 
   useEffect(() => {
-    if (logado) carregarAnuncios();
-  }, [logado]);
+    if (logado && pinSessao) carregarAnuncios();
+  }, [logado, pinSessao]);
 
   const carregarAnuncios = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/anuncios');
+      const res = await fetch('/api/admin/anuncios', {
+        headers: { 'x-admin-pin': pinSessao }
+      });
       const data = await res.json();
       if (data.success) setAnuncios(data.data);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
   };
 
-  const sair = () => setLogado(false);
+  const sair = () => { setLogado(false); setPinSessao(""); setAnuncios([]); };
 
   const atualizarStatus = async (id: string, status: Status) => {
     try {
       const res = await fetch('/api/admin/anuncios', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-admin-pin': pinSessao },
         body: JSON.stringify({ id, status })
       });
       const data = await res.json();
@@ -194,13 +185,13 @@ export default function PainelAdmin() {
     } catch { alert('Erro ao atualizar status'); }
   };
 
-  if (!logado) return <PinScreen onLogin={() => setLogado(true)} />;
+  if (!logado) return <PinScreen onLogin={(pin) => { setPinSessao(pin); setLogado(true); }} />;
 
   const stats = {
-    total: anuncios.length,
+    total:     anuncios.length,
     pendentes: anuncios.filter(a => a.status === 'EM_ANALISE').length,
     aprovados: anuncios.filter(a => a.status === 'ATIVO').length,
-    rejeitados: anuncios.filter(a => a.status === 'REMOVIDO').length,
+    rejeitados:anuncios.filter(a => a.status === 'REMOVIDO').length,
   };
 
   const visiveis = filtro === 'todos' ? anuncios : anuncios.filter(a => a.status === filtro);
@@ -235,7 +226,7 @@ export default function PainelAdmin() {
         </div>
 
         {aba === "configuracoes" ? (
-          <Card><TrocarPin onVoltar={() => setAba("anuncios")} /></Card>
+          <Card><TrocarPin pin={pinSessao} onVoltar={() => setAba("anuncios")} /></Card>
         ) : (
           <>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -256,10 +247,10 @@ export default function PainelAdmin() {
 
             <div className="flex flex-wrap gap-2">
               {[
-                { id: "todos", label: "Todos" },
+                { id: "todos",      label: "Todos" },
                 { id: "EM_ANALISE", label: "Pendentes" },
-                { id: "ATIVO", label: "Aprovados" },
-                { id: "REMOVIDO", label: "Rejeitados" },
+                { id: "ATIVO",      label: "Aprovados" },
+                { id: "REMOVIDO",   label: "Rejeitados" },
               ].map(({ id, label }) => (
                 <button key={id} onClick={() => setFiltro(id as any)}
                   className="rounded-lg px-4 py-1.5 text-sm font-semibold transition-colors"
@@ -284,31 +275,31 @@ export default function PainelAdmin() {
                     </thead>
                     <tbody>
                       {visiveis.map((a, idx) => {
-                        const badge = badgeStatus[a.status];
+                        const badge = badgeStatus[a.status] || badgeStatus.EM_ANALISE;
                         return (
                           <tr key={a.id} style={{ borderBottom: "1px solid #4A1A5C" }} className="transition-colors hover:bg-[#2e0e3e]">
                             <td className="px-4 py-3" style={{ color: "#c9a8e0" }}>{idx + 1}</td>
                             <td className="px-4 py-3 font-medium text-white whitespace-nowrap">{a.titulo}</td>
                             <td className="px-4 py-3 whitespace-nowrap" style={{ color: "#c9a8e0" }}>{a.cidade} - {a.estado}</td>
                             <td className="px-4 py-3 whitespace-nowrap" style={{ color: "#c9a8e0" }}>{a.whatsapp}</td>
-                            <td className="px-4 py-3 whitespace-nowrap" style={{ color: "#c9a8e0" }}>{a.cache ? "R$ " + Number(a.cache).toFixed(0) : '-'}</td>
-                            <td className="px-4 py-3 whitespace-nowrap" style={{ color: "#c9a8e0" }}>{new Date(a.criadoEm).toLocaleDateString('pt-BR')}</td>
+                            <td className="px-4 py-3 whitespace-nowrap" style={{ color: "#c9a8e0" }}>{a.cache ? "R$ " + Number(a.cache).toFixed(0) : "-"}</td>
+                            <td className="px-4 py-3 whitespace-nowrap" style={{ color: "#c9a8e0" }}>{new Date(a.criadoEm).toLocaleDateString("pt-BR")}</td>
                             <td className="px-4 py-3">
                               <span className="rounded-full px-2.5 py-0.5 text-xs font-bold uppercase" style={{ backgroundColor: badge.bg, color: badge.color }}>{badge.label}</span>
                             </td>
                             <td className="px-4 py-3">
                               <div className="flex items-center gap-2">
-                                <button onClick={() => atualizarStatus(a.id, 'ATIVO')} disabled={a.status === 'ATIVO'}
+                                <button onClick={() => atualizarStatus(a.id, "ATIVO")} disabled={a.status === "ATIVO"}
                                   title="Aprovar" className="flex h-7 w-7 items-center justify-center rounded-lg transition-opacity hover:opacity-80 disabled:opacity-30"
                                   style={{ backgroundColor: "#14532d" }}>
                                   <Check size={14} stroke="#4ade80" />
                                 </button>
-                                <button onClick={() => atualizarStatus(a.id, 'REMOVIDO')} disabled={a.status === 'REMOVIDO'}
+                                <button onClick={() => atualizarStatus(a.id, "REMOVIDO")} disabled={a.status === "REMOVIDO"}
                                   title="Rejeitar" className="flex h-7 w-7 items-center justify-center rounded-lg transition-opacity hover:opacity-80 disabled:opacity-30"
                                   style={{ backgroundColor: "#450a0a" }}>
                                   <X size={14} stroke="#f87171" />
                                 </button>
-                                <a href={"/acompanhantes/" + a.cidade?.toLowerCase().replace(/\s+/g, '-') + "/" + a.slug} target="_blank"
+                                <a href={"/acompanhantes/" + a.cidade?.toLowerCase().replace(/\s+/g, "-") + "/" + a.slug} target="_blank"
                                   title="Visualizar" className="flex h-7 w-7 items-center justify-center rounded-lg transition-opacity hover:opacity-80"
                                   style={{ backgroundColor: "#1e1b4b" }}>
                                   <Eye size={14} stroke="#a78bfa" />
