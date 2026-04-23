@@ -1,170 +1,124 @@
 "use client";
-import { useState } from "react";
-import { Eye, EyeOff, User, Megaphone } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 
-type Perfil = "cliente" | "anunciante";
-type Modo = "login" | "registro";
+const categorias = ["Todas","Loiras","Morenas","Ruivas","Acompanhantes de Luxo","Universitarias"];
 
-const inputCls = "w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 outline-none focus:ring-2 focus:ring-[#C0306A]";
-const inputStyle = { backgroundColor: "#1A0A1E", border: "1px solid #4A1A5C" };
+export default function Home() {
+  const [anuncios, setAnuncios] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [busca, setBusca] = useState("");
+  const [categoria, setCategoria] = useState("Todas");
 
-export default function LoginPage() {
-  const router = useRouter();
-  const [perfil, setPerfil] = useState<Perfil>("cliente");
-  const [modo, setModo] = useState<Modo>("login");
-  const [nome, setNome] = useState("");
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [telefone, setTelefone] = useState("");
-  const [senhaVisivel, setSenhaVisivel] = useState(false);
-  const [erro, setErro] = useState("");
-  const [carregando, setCarregando] = useState(false);
+  useEffect(() => {
+    fetch("/api/anuncios")
+      .then(res => res.json())
+      .then(data => { if (data.success) setAnuncios(data.data); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErro("");
-    setCarregando(true);
-    try {
-      if (modo === "login") {
-        const res = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, senha })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Erro ao fazer login");
-        document.cookie = "token=" + data.token + "; path=/; max-age=" + (60 * 60 * 24 * 7);
-        localStorage.setItem("usuario", JSON.stringify(data.usuario));
-        if (data.usuario.tipo === "ANUNCIANTE") router.push("/painel");
-        else router.push("/");
-      } else {
-        const res = await fetch('/api/auth/registro', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nome, email, senha, telefone, tipo: perfil.toUpperCase() })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Erro ao criar conta");
-        document.cookie = "token=" + data.token + "; path=/; max-age=" + (60 * 60 * 24 * 7);
-        localStorage.setItem("usuario", JSON.stringify(data.usuario));
-        if (data.usuario.tipo === "ANUNCIANTE") router.push("/como-funciona");
-        else router.push("/");
-      }
-    } catch (err: any) {
-      setErro(err.message);
-    } finally {
-      setCarregando(false);
-    }
-  };
+  const filtrados = anuncios.filter(ad => {
+    if (!busca) return true;
+    const t = busca.toLowerCase();
+    return ad.titulo?.toLowerCase().includes(t) || ad.cidade?.toLowerCase().includes(t);
+  });
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-4 py-8" style={{ backgroundColor: "#1A0A1E" }}>
-      <div className="w-full max-w-md">
+    <main className="min-h-screen" style={{ backgroundColor: "#1A0A1E" }}>
 
-        {/* Logo */}
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-white">
-            Acompanhantes<span style={{ color: "#C0306A" }}>NaWeb</span>
-          </h1>
-          <p className="mt-2 text-sm" style={{ color: "#c9a8e0" }}>
-            {modo === "login" ? "Entre na sua conta" : "Crie sua conta gratuita"}
-          </p>
+      {/* Hero — compacto no mobile */}
+      <section className="px-4 py-8 text-center sm:py-12" style={{ background: "linear-gradient(180deg, #250C30 0%, #1A0A1E 100%)" }}>
+        <h1 className="text-2xl font-bold text-white sm:text-4xl">
+          Acompanhantes<span style={{ color: "#C0306A" }}>NaWeb</span>
+        </h1>
+        <p className="mt-2 text-sm sm:text-base" style={{ color: "#c9a8e0" }}>
+          As mais belas acompanhantes do Brasil
+        </p>
+        <div className="mx-auto mt-4 max-w-lg">
+          <input type="text" placeholder="Buscar por nome ou cidade..."
+            value={busca} onChange={e => setBusca(e.target.value)}
+            className="w-full rounded-xl px-4 py-3 text-sm text-white outline-none focus:ring-2 focus:ring-[#C0306A]"
+            style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }} />
         </div>
+      </section>
 
-        {/* Card */}
-        <div className="rounded-2xl p-6 sm:p-8" style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }}>
-
-          {/* Seletor de perfil */}
-          <div className="mb-6 grid grid-cols-2 gap-3">
-            <button onClick={() => setPerfil("cliente")}
-              className="flex flex-col items-center gap-2 rounded-xl p-4 transition-all"
-              style={{ backgroundColor: perfil === "cliente" ? "#C0306A" : "#1A0A1E", border: "2px solid " + (perfil === "cliente" ? "#C0306A" : "#4A1A5C") }}>
-              <User size={22} color="#fff" />
-              <span className="text-sm font-bold text-white">Cliente</span>
-              <span className="text-xs text-center" style={{ color: perfil === "cliente" ? "#ffcce0" : "#c9a8e0" }}>Encontrar acompanhantes</span>
-            </button>
-            <button onClick={() => setPerfil("anunciante")}
-              className="flex flex-col items-center gap-2 rounded-xl p-4 transition-all"
-              style={{ backgroundColor: perfil === "anunciante" ? "#C0306A" : "#1A0A1E", border: "2px solid " + (perfil === "anunciante" ? "#C0306A" : "#4A1A5C") }}>
-              <Megaphone size={22} color="#fff" />
-              <span className="text-sm font-bold text-white">Anunciante</span>
-              <span className="text-xs text-center" style={{ color: perfil === "anunciante" ? "#ffcce0" : "#c9a8e0" }}>Publicar meu anuncio</span>
-            </button>
+      {/* Categorias */}
+      <section className="px-4 py-4">
+        <div className="mx-auto max-w-6xl overflow-x-auto">
+          <div className="flex gap-2 pb-1" style={{ minWidth: "max-content" }}>
+            {categorias.map(cat => (
+              <button key={cat} onClick={() => setCategoria(cat)}
+                className="rounded-full px-4 py-1.5 text-sm font-semibold whitespace-nowrap transition-all"
+                style={{
+                  backgroundColor: categoria === cat ? "#C0306A" : "#250C30",
+                  color: categoria === cat ? "#fff" : "#c9a8e0",
+                  border: "1px solid " + (categoria === cat ? "#C0306A" : "#4A1A5C"),
+                }}>
+                {cat}
+              </button>
+            ))}
           </div>
+        </div>
+      </section>
 
-          {/* Toggle login/registro */}
-          <div className="mb-6 flex overflow-hidden rounded-xl" style={{ backgroundColor: "#1A0A1E", border: "1px solid #4A1A5C" }}>
-            <button onClick={() => { setModo("login"); setErro(""); }}
-              className="flex-1 py-2.5 text-sm font-semibold transition-colors"
-              style={modo === "login" ? { backgroundColor: "#C0306A", color: "#fff" } : { color: "#c9a8e0" }}>
-              Entrar
-            </button>
-            <button onClick={() => { setModo("registro"); setErro(""); }}
-              className="flex-1 py-2.5 text-sm font-semibold transition-colors"
-              style={modo === "registro" ? { backgroundColor: "#C0306A", color: "#fff" } : { color: "#c9a8e0" }}>
-              Criar conta
-            </button>
-          </div>
+      {/* Grid de anúncios */}
+      <section className="px-4 pb-16 pt-2">
+        <div className="mx-auto max-w-6xl">
+          <p className="mb-4 text-sm font-semibold text-white">
+            Anuncios em Destaque
+            <span className="ml-2 font-normal" style={{ color: "#c9a8e0" }}>({filtrados.length})</span>
+          </p>
 
-          {/* Erro */}
-          {erro && (
-            <div className="mb-4 rounded-xl px-4 py-3 text-sm text-red-300" style={{ backgroundColor: "#3a0a0a", border: "1px solid #ef4444" }}>
-              {erro}
+          {loading && (
+            <div className="flex justify-center py-20">
+              <div className="h-8 w-8 animate-spin rounded-full" style={{ border: "3px solid #4A1A5C", borderTopColor: "#C0306A" }} />
             </div>
           )}
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            {modo === "registro" && (
-              <>
-                <div className="flex flex-col gap-1">
-                  <label className="text-sm font-medium" style={{ color: "#c9a8e0" }}>Nome completo</label>
-                  <input type="text" value={nome} onChange={e => setNome(e.target.value)}
-                    placeholder="Seu nome" required className={inputCls} style={inputStyle} />
+          {!loading && filtrados.length === 0 && (
+            <p className="py-20 text-center text-sm" style={{ color: "#c9a8e0" }}>Nenhum anuncio encontrado.</p>
+          )}
+
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {filtrados.map(ad => (
+              <Link key={ad.id}
+                href={"/acompanhantes/" + (ad.cidade?.toLowerCase().replace(/\s+/g, '-') || 'brasil') + "/" + ad.slug}
+                className="group flex flex-col overflow-hidden rounded-xl transition-transform active:scale-95"
+                style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }}>
+
+                {/* Foto */}
+                <div className="relative w-full overflow-hidden" style={{ paddingBottom: "125%", backgroundColor: "#3a1550" }}>
+                  {ad.midias?.[0]?.url ? (
+                    <img src={ad.midias[0].url} alt={ad.titulo}
+                      className="absolute inset-0 h-full w-full object-cover transition-transform group-hover:scale-105" />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-4xl opacity-20">👤</span>
+                    </div>
+                  )}
+                  {(ad.plano === "ULTRATOP" || ad.plano === "SUPERTOP") && (
+                    <span className="absolute left-1.5 top-1.5 rounded-full px-2 py-0.5 text-xs font-bold"
+                      style={{ backgroundColor: "#B8960C", color: "#fff" }}>
+                      {ad.plano === "ULTRATOP" ? "TOP" : "VIP"}
+                    </span>
+                  )}
                 </div>
-                <div className="flex flex-col gap-1">
-                  <label className="text-sm font-medium" style={{ color: "#c9a8e0" }}>Telefone / WhatsApp</label>
-                  <input type="tel" value={telefone} onChange={e => setTelefone(e.target.value)}
-                    placeholder="(11) 99999-0000" className={inputCls} style={inputStyle} />
+
+                {/* Info */}
+                <div className="p-2.5 flex flex-col gap-0.5">
+                  <p className="text-xs font-bold text-white leading-tight line-clamp-1">{ad.titulo}</p>
+                  <p className="text-xs" style={{ color: "#c9a8e0" }}>{ad.cidade} - {ad.estado}</p>
+                  {ad.cache && (
+                    <p className="text-xs font-bold mt-0.5" style={{ color: "#C0306A" }}>
+                      R$ {Number(ad.cache).toFixed(0)}/h
+                    </p>
+                  )}
                 </div>
-              </>
-            )}
-
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium" style={{ color: "#c9a8e0" }}>E-mail</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-                placeholder="seu@email.com" required className={inputCls} style={inputStyle} />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium" style={{ color: "#c9a8e0" }}>Senha</label>
-              <div className="relative">
-                <input type={senhaVisivel ? "text" : "password"} value={senha} onChange={e => setSenha(e.target.value)}
-                  placeholder="Minimo 6 caracteres" required minLength={6}
-                  className={inputCls + " pr-12"} style={inputStyle} />
-                <button type="button" onClick={() => setSenhaVisivel(v => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: "#c9a8e0" }}>
-                  {senhaVisivel ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-            </div>
-
-            <button type="submit" disabled={carregando}
-              className="mt-2 w-full rounded-xl py-3.5 font-bold uppercase tracking-wide text-white hover:opacity-90 disabled:opacity-50"
-              style={{ backgroundColor: "#C0306A" }}>
-              {carregando ? "Aguarde..." : modo === "login" ? "Entrar" : "Criar conta"}
-            </button>
-          </form>
-
-          {/* Voltar ao site */}
-          <div className="mt-6 text-center">
-            <a href="/" className="text-sm hover:underline" style={{ color: "#c9a8e0" }}>
-              ← Voltar ao site sem entrar
-            </a>
+              </Link>
+            ))}
           </div>
         </div>
-      </div>
+      </section>
     </main>
   );
 }
