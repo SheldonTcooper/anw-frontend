@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
 import { ChevronDown, Menu, X, LogIn, PlusCircle } from "lucide-react";
 
@@ -22,12 +22,14 @@ export default function Header() {
     window.location.href = "/";
   };
 
+  const linkPainel = usuario?.tipo === "ADMIN" ? "/admin" : "/painel";
+  const labelPainel = usuario?.tipo === "ADMIN" ? "Admin" : "Painel";
+  const temPainel = usuario?.tipo === "ADMIN" || usuario?.tipo === "ANUNCIANTE";
+
   return (
     <header style={{ backgroundColor: "#250C30", borderBottom: "1px solid #4A1A5C" }} className="w-full sticky top-0 z-30">
       <div className="mx-auto max-w-6xl px-4 py-3">
         <div className="flex items-center justify-between gap-2">
-
-          {/* Categorias — desktop */}
           <div className="relative hidden sm:block">
             <button onClick={() => setMenuCat(v => !v)}
               className="flex items-center gap-1 text-sm font-semibold text-white hover:opacity-80">
@@ -48,18 +50,18 @@ export default function Header() {
             )}
           </div>
 
-          {/* Logo */}
           <a href="/" className="text-lg font-bold sm:text-xl" style={{ color: "#C0306A" }}>
             AcompanhantesNaWeb
           </a>
 
-          {/* Desktop — botões */}
           <div className="hidden sm:flex items-center gap-3">
             {usuario ? (
               <>
                 <span className="text-sm" style={{ color: "#c9a8e0" }}>Ola, {usuario.nome?.split(" ")[0]}</span>
-                {usuario.tipo === "ANUNCIANTE" && (
-                  <a href="/painel" className="text-sm font-semibold hover:underline" style={{ color: "#c9a8e0" }}>Painel</a>
+                {temPainel && (
+                  <a href={linkPainel} className="text-sm font-semibold hover:underline" style={{ color: "#c9a8e0" }}>
+                    {labelPainel}
+                  </a>
                 )}
                 <button onClick={sair} className="text-sm font-semibold hover:underline" style={{ color: "#c9a8e0" }}>Sair</button>
               </>
@@ -74,23 +76,21 @@ export default function Header() {
             )}
           </div>
 
-          {/* Mobile — hamburger */}
           <button onClick={() => setMenuMobile(v => !v)} className="flex sm:hidden items-center justify-center rounded-lg p-2"
             style={{ backgroundColor: "#1A0A1E" }}>
             {menuMobile ? <X size={20} color="#fff" /> : <Menu size={20} color="#fff" />}
           </button>
         </div>
 
-        {/* Mobile menu */}
         {menuMobile && (
           <div className="mt-3 flex flex-col gap-2 sm:hidden pb-2">
             <div className="flex gap-2">
               {usuario ? (
                 <>
-                  {usuario.tipo === "ANUNCIANTE" && (
-                    <a href="/painel" className="flex-1 rounded-lg py-2.5 text-center text-sm font-bold text-white"
+                  {temPainel && (
+                    <a href={linkPainel} className="flex-1 rounded-lg py-2.5 text-center text-sm font-bold text-white"
                       style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }}>
-                      Meu Painel
+                      {labelPainel}
                     </a>
                   )}
                   <button onClick={sair} className="flex-1 rounded-lg py-2.5 text-center text-sm font-bold"
