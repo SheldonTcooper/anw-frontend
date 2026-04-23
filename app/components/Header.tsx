@@ -1,6 +1,6 @@
 ﻿"use client";
 import { useState, useEffect } from "react";
-import { ChevronDown, Menu, X, LogIn, PlusCircle } from "lucide-react";
+import { ChevronDown, Menu, X, LogIn, PlusCircle, Shield } from "lucide-react";
 
 const categorias = ["Mulheres","Trans","Homens","Gays","Casais","Massagistas","Chamadas de Video"];
 
@@ -30,6 +30,7 @@ export default function Header() {
     <header style={{ backgroundColor: "#250C30", borderBottom: "1px solid #4A1A5C" }} className="w-full sticky top-0 z-30">
       <div className="mx-auto max-w-6xl px-4 py-3">
         <div className="flex items-center justify-between gap-2">
+
           <div className="relative hidden sm:block">
             <button onClick={() => setMenuCat(v => !v)}
               className="flex items-center gap-1 text-sm font-semibold text-white hover:opacity-80">
@@ -68,13 +69,13 @@ export default function Header() {
             ) : (
               <>
                 <a href="/login" className="text-sm font-semibold hover:underline" style={{ color: "#c9a8e0" }}>Entrar</a>
+                <a href="/admin" className="flex items-center gap-1 rounded-lg px-3 py-2 text-xs font-bold uppercase text-white hover:opacity-90"
+                  style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }}>
+                  <Shield size={13} /> Admin
+                </a>
                 <a href="/anunciar" className="rounded-lg px-3 py-2 text-xs font-bold uppercase text-white hover:opacity-90"
                   style={{ backgroundColor: "#C0306A" }}>
                   Publicar
-                </a>
-                <a href="/admin" className="rounded-lg px-3 py-2 text-xs font-bold uppercase text-white hover:opacity-90"
-                  style={{ backgroundColor: "#1A0A1E", border: "1px solid #4A1A5C" }}>
-                  Admin
                 </a>
               </>
             )}
@@ -108,6 +109,10 @@ export default function Header() {
                     style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }}>
                     <LogIn size={16} /> Entrar
                   </a>
+                  <a href="/admin" className="flex-1 flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-bold text-white"
+                    style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }}>
+                    <Shield size={16} /> Admin
+                  </a>
                   <a href="/anunciar" className="flex-1 flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-bold text-white"
                     style={{ backgroundColor: "#C0306A" }}>
                     <PlusCircle size={16} /> Publicar
@@ -140,4 +145,3 @@ export default function Header() {
     </header>
   );
 }
-
