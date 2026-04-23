@@ -1,19 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { randomUUID } from "crypto";
 
-const prisma = new PrismaClient();
+export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   try {
-    const { nome, email, senha, telefone } = await req.json();
+    const { prisma } = await import('../../../../lib/prisma')
+    const { nome, email, senha, telefone, tipo } = await req.json();
+
+    if (!nome || !email || !senha) {
+      return NextResponse.json({ error: "Nome, email e senha sao obrigatorios" }, { status: 400 });
+    }
 
     const existe = await prisma.usuarios.findUnique({ where: { email } });
-    if (existe) return NextResponse.json({ error: "E-mail já cadastrado" }, { status: 400 });
+    if (existe) return NextResponse.json({ error: "E-mail ja cadastrado" }, { status: 400 });
 
     const senhaHash = await bcrypt.hash(senha, 10);
+    const tipoUsuario = tipo === "CLIENTE" ? "CLIENTE" : "ANUNCIANTE";
 
     const usuario = await prisma.usuarios.create({
       data: {
@@ -21,8 +26,8 @@ export async function POST(req: NextRequest) {
         nome,
         email,
         senhaHash,
-        telefone,
-        tipo: "ANUNCIANTE",
+        telefone: telefone || null,
+        tipo: tipoUsuario,
         atualizadoEm: new Date(),
       }
     });
@@ -37,7 +42,8 @@ export async function POST(req: NextRequest) {
       token,
       usuario: { id: usuario.id, nome: usuario.nome, email: usuario.email, tipo: usuario.tipo }
     });
-  } catch (err) {
+  } catch (err: any) {
+    console.error("Erro registro:", err.message);
     return NextResponse.json({ error: "Erro interno" }, { status: 500 });
   }
 }
