@@ -1,22 +1,16 @@
 "use client";
-import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
+
+const paginasLivres = ["/admin", "/login", "/termos-de-uso", "/privacidade", "/como-funciona"];
 
 export default function AvisoMaioridade() {
   const router = useRouter();
   const pathname = usePathname();
-  const [mostrar, setMostrar] = useState(false);
 
-  const paginasLivres = ["/admin", "/login", "/termos-de-uso", "/privacidade", "/como-funciona"];
-
-  useEffect(() => {
-    const isPaginaLivre = paginasLivres.some(p => pathname?.startsWith(p));
-    if (isPaginaLivre) { setMostrar(false); return; }
-    setMostrar(true);
-  }, [pathname]);
+  const isPaginaLivre = paginasLivres.some(p => pathname?.startsWith(p));
+  if (isPaginaLivre) return null;
 
   const confirmarMaioridade = () => {
-    setMostrar(false);
     try {
       const usuario = localStorage.getItem("usuario");
       if (!usuario) router.push("/login");
@@ -28,8 +22,6 @@ export default function AvisoMaioridade() {
   const sair = () => {
     window.location.href = "https://www.google.com.br";
   };
-
-  if (!mostrar) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4"
