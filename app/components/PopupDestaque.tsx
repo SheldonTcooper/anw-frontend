@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
 import { X, MessageCircle } from "lucide-react";
 
@@ -41,7 +41,7 @@ export default function PopupDestaque() {
             <img src={anuncio.midias[0].url} alt={anuncio.titulo} className="absolute inset-0 w-full h-full object-cover" />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-6xl">👤</span>
+              <span className="text-6xl">ðŸ‘¤</span>
             </div>
           )}
           <div className="absolute inset-0" style={{ background: "linear-gradient(to top, #1A0A1E 0%, transparent 50%)" }} />
