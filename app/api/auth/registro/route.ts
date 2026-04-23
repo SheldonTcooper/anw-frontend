@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0] ?? "unknown"
-  const limit = rateLimit({ ip: "registro:" + ip, limite: 3, janela: 3600000 })
+  const limit = rateLimit({ ip: "registro:" + ip, limite: 10, janela: 3600000 })
 
   if (!limit.ok) {
     return NextResponse.json(
