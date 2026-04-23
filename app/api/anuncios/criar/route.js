@@ -1,5 +1,5 @@
 ﻿import { z } from 'zod'
-import { rateLimit } from '../../../lib/rateLimit'
+import { rateLimit } from '../../../../lib/rateLimit'
 
 export const dynamic = 'force-dynamic'
 
@@ -118,4 +118,5 @@ export async function POST(request) {
     return Response.json({ success: false, error: "Erro interno" }, { status: 500 })
   }
 }
+
 
