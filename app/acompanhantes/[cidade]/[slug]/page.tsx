@@ -1,6 +1,6 @@
 ﻿"use client";
 import { useState, useEffect } from "react";
-import { Heart, MapPin, Phone, MessageCircle, ChevronLeft, Star, Clock, Calculator } from "lucide-react";
+import { Heart, MapPin, Phone, MessageCircle, ChevronLeft, Star, Clock, Calculator, ChevronRight } from "lucide-react";
 
 function calcularIdade(nascimento: string | null) {
   if (!nascimento) return null;
@@ -64,6 +64,10 @@ export default function PaginaAnuncio({ params }: { params: { cidade: string; sl
     return "https://wa.me/55" + anuncio.whatsapp + "?text=" + encodeURIComponent(msg);
   };
 
+  const servicosTags = anuncio.anuncios_tags?.filter((at: any) => at.tags.cluster === "servico") || [];
+  const biotiposTags = anuncio.anuncios_tags?.filter((at: any) => at.tags.cluster === "biotipo") || [];
+  const identidadesTags = anuncio.anuncios_tags?.filter((at: any) => at.tags.cluster === "identidade") || [];
+
   return (
     <main className="min-h-screen px-4 py-6 sm:px-8" style={{ backgroundColor: "#1A0A1E" }}>
       <nav className="mb-4 flex items-center gap-2 text-sm" style={{ color: "#c9a8e0" }}>
@@ -81,14 +85,28 @@ export default function PaginaAnuncio({ params }: { params: { cidade: string; sl
           {/* Fotos */}
           <div className="flex flex-col gap-3 lg:w-1/2">
             <div className="relative w-full overflow-hidden rounded-xl" style={{ paddingBottom: "133.33%", backgroundColor: "#3a3a3a" }}>
-                <button type="button" onClick={() => setFotoAtiva(i => i > 0 ? i - 1 : fotos.length - 1)} className="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full" style={{ backgroundColor: "rgba(0,0,0,0.6)" }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg></button>
-                <button type="button" onClick={() => setFotoAtiva(i => i < fotos.length - 1 ? i + 1 : 0)} className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full" style={{ backgroundColor: "rgba(0,0,0,0.6)" }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg></button>
               <div className="absolute inset-0 flex items-center justify-center">
                 {fotos[fotoAtiva]?.url
                   ? <img src={fotos[fotoAtiva].url} alt={anuncio.titulo} className="w-full h-full object-cover" />
-                  : <span className="text-5xl text-gray-600">­ƒôÀ</span>
+                  : <span className="text-5xl text-gray-600">📷</span>
                 }
               </div>
+              {fotos.length > 1 && (
+                <>
+                  <button type="button"
+                    onClick={() => setFotoAtiva(i => i > 0 ? i - 1 : fotos.length - 1)}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full"
+                    style={{ backgroundColor: "rgba(0,0,0,0.6)" }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
+                  </button>
+                  <button type="button"
+                    onClick={() => setFotoAtiva(i => i < fotos.length - 1 ? i + 1 : 0)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full"
+                    style={{ backgroundColor: "rgba(0,0,0,0.6)" }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
+                  </button>
+                </>
+              )}
               <button onClick={() => setCurtido(v => !v)} className="absolute right-3 top-3 rounded-full p-2" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
                 <Heart size={22} fill={curtido ? "#C0306A" : "none"} stroke={curtido ? "#C0306A" : "#fff"} />
               </button>
@@ -105,7 +123,7 @@ export default function PaginaAnuncio({ params }: { params: { cidade: string; sl
             )}
           </div>
 
-          {/* Informa├º├Áes */}
+          {/* Informacoes */}
           <div className="flex flex-col gap-5 lg:w-1/2">
             <div className="flex flex-wrap items-center gap-3">
               <h1 className="text-3xl font-bold text-white">{anuncio.titulo}</h1>
@@ -119,11 +137,10 @@ export default function PaginaAnuncio({ params }: { params: { cidade: string; sl
             <div className="flex items-center gap-1 text-sm" style={{ color: "#c9a8e0" }}>
               <MapPin size={15} />
               <span>{anuncio.cidade}</span>
-              {anuncio.bairro && <><span>┬À</span><span>{anuncio.bairro}</span></>}
+              {anuncio.bairro && <><span>·</span><span>{anuncio.bairro}</span></>}
               <span>- {anuncio.estado}</span>
             </div>
 
-            {/* Valor e idade */}
             <div className="flex items-center gap-6">
               {idade && (
                 <div>
@@ -139,7 +156,6 @@ export default function PaginaAnuncio({ params }: { params: { cidade: string; sl
               )}
             </div>
 
-            {/* CALCULADORA DE HORAS */}
             {valorHora && (
               <div className="rounded-xl p-4" style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }}>
                 <div className="flex items-center gap-2 mb-3">
@@ -165,15 +181,12 @@ export default function PaginaAnuncio({ params }: { params: { cidade: string; sl
                       <Clock size={14} />
                       <span className="text-sm">{opcoesTempo.find(o => o.horas === horasSelecionadas)?.label}</span>
                     </div>
-                    <span className="text-xl font-bold" style={{ color: "#C0306A" }}>
-                      R$ {valorTotal.toFixed(0)}
-                    </span>
+                    <span className="text-xl font-bold" style={{ color: "#C0306A" }}>R$ {valorTotal.toFixed(0)}</span>
                   </div>
                 )}
               </div>
             )}
 
-            {/* Bot├Áes de contato */}
             <div className="flex flex-col gap-3">
               {anuncio.whatsapp && (
                 <a href={mensagemWhatsApp()} target="_blank" rel="noopener noreferrer"
@@ -194,7 +207,6 @@ export default function PaginaAnuncio({ params }: { params: { cidade: string; sl
           </div>
         </div>
 
-        {/* Descri├º├úo */}
         {anuncio.descricao && (
           <section className="mt-8 rounded-xl p-6" style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }}>
             <h2 className="mb-3 text-lg font-bold text-white">Sobre mim</h2>
@@ -202,11 +214,25 @@ export default function PaginaAnuncio({ params }: { params: { cidade: string; sl
           </section>
         )}
 
-        {anuncio.anuncios_tags && anuncio.anuncios_tags.filter((at: any) => at.tags.cluster === "servico").length > 0 && (
+        {identidadesTags.length > 0 && (
+          <section className="mt-4 rounded-xl p-6" style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }}>
+            <h2 className="mb-4 text-lg font-bold text-white">Identidade</h2>
+            <div className="flex flex-wrap gap-2">
+              {identidadesTags.map((at: any) => (
+                <span key={at.tags.slug} className="rounded-full px-3 py-1.5 text-sm font-medium"
+                  style={{ backgroundColor: "#2d1f3d", border: "1px solid #a78bfa", color: "#a78bfa" }}>
+                  {at.tags.nome}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {servicosTags.length > 0 && (
           <section className="mt-4 rounded-xl p-6" style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }}>
             <h2 className="mb-4 text-lg font-bold text-white">O que eu faco</h2>
             <div className="flex flex-wrap gap-2">
-              {anuncio.anuncios_tags.filter((at: any) => at.tags.cluster === "servico").map((at: any) => (
+              {servicosTags.map((at: any) => (
                 <span key={at.tags.slug} className="rounded-full px-3 py-1.5 text-sm font-medium"
                   style={{ backgroundColor: "#3a1550", border: "1px solid #C0306A", color: "#fff" }}>
                   {at.tags.nome}
@@ -215,11 +241,12 @@ export default function PaginaAnuncio({ params }: { params: { cidade: string; sl
             </div>
           </section>
         )}
-        {anuncio.anuncios_tags && anuncio.anuncios_tags.filter((at: any) => at.tags.cluster === "biotipo").length > 0 && (
+
+        {biotiposTags.length > 0 && (
           <section className="mt-4 rounded-xl p-6" style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }}>
             <h2 className="mb-4 text-lg font-bold text-white">Biotipo</h2>
             <div className="flex flex-wrap gap-2">
-              {anuncio.anuncios_tags.filter((at: any) => at.tags.cluster === "biotipo").map((at: any) => (
+              {biotiposTags.map((at: any) => (
                 <span key={at.tags.slug} className="rounded-full px-3 py-1.5 text-sm font-medium"
                   style={{ backgroundColor: "#1e3a5f", border: "1px solid #60a5fa", color: "#60a5fa" }}>
                   {at.tags.nome}
@@ -228,9 +255,7 @@ export default function PaginaAnuncio({ params }: { params: { cidade: string; sl
             </div>
           </section>
         )}
-            </div>
-          </section>
-        )}
+
       </div>
     </main>
   );
