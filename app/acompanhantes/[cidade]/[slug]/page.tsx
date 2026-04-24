@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
 import { Heart, MapPin, Phone, MessageCircle, ChevronLeft, Star, Clock, Calculator } from "lucide-react";
 
@@ -81,10 +81,12 @@ export default function PaginaAnuncio({ params }: { params: { cidade: string; sl
           {/* Fotos */}
           <div className="flex flex-col gap-3 lg:w-1/2">
             <div className="relative w-full overflow-hidden rounded-xl" style={{ paddingBottom: "133.33%", backgroundColor: "#3a3a3a" }}>
+                <button type="button" onClick={() => setFotoAtiva(i => i > 0 ? i - 1 : fotos.length - 1)} className="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full" style={{ backgroundColor: "rgba(0,0,0,0.6)" }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+                <button type="button" onClick={() => setFotoAtiva(i => i < fotos.length - 1 ? i + 1 : 0)} className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full" style={{ backgroundColor: "rgba(0,0,0,0.6)" }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg></button>
               <div className="absolute inset-0 flex items-center justify-center">
                 {fotos[fotoAtiva]?.url
                   ? <img src={fotos[fotoAtiva].url} alt={anuncio.titulo} className="w-full h-full object-cover" />
-                  : <span className="text-5xl text-gray-600">📷</span>
+                  : <span className="text-5xl text-gray-600">­ƒôÀ</span>
                 }
               </div>
               <button onClick={() => setCurtido(v => !v)} className="absolute right-3 top-3 rounded-full p-2" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
@@ -103,7 +105,7 @@ export default function PaginaAnuncio({ params }: { params: { cidade: string; sl
             )}
           </div>
 
-          {/* Informações */}
+          {/* Informa├º├Áes */}
           <div className="flex flex-col gap-5 lg:w-1/2">
             <div className="flex flex-wrap items-center gap-3">
               <h1 className="text-3xl font-bold text-white">{anuncio.titulo}</h1>
@@ -117,7 +119,7 @@ export default function PaginaAnuncio({ params }: { params: { cidade: string; sl
             <div className="flex items-center gap-1 text-sm" style={{ color: "#c9a8e0" }}>
               <MapPin size={15} />
               <span>{anuncio.cidade}</span>
-              {anuncio.bairro && <><span>·</span><span>{anuncio.bairro}</span></>}
+              {anuncio.bairro && <><span>┬À</span><span>{anuncio.bairro}</span></>}
               <span>- {anuncio.estado}</span>
             </div>
 
@@ -171,7 +173,7 @@ export default function PaginaAnuncio({ params }: { params: { cidade: string; sl
               </div>
             )}
 
-            {/* Botões de contato */}
+            {/* Bot├Áes de contato */}
             <div className="flex flex-col gap-3">
               {anuncio.whatsapp && (
                 <a href={mensagemWhatsApp()} target="_blank" rel="noopener noreferrer"
@@ -192,7 +194,7 @@ export default function PaginaAnuncio({ params }: { params: { cidade: string; sl
           </div>
         </div>
 
-        {/* Descrição */}
+        {/* Descri├º├úo */}
         {anuncio.descricao && (
           <section className="mt-8 rounded-xl p-6" style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }}>
             <h2 className="mb-3 text-lg font-bold text-white">Sobre mim</h2>
@@ -200,7 +202,7 @@ export default function PaginaAnuncio({ params }: { params: { cidade: string; sl
           </section>
         )}
 
-        {/* Serviços */}
+        {/* Servi├ºos */}
         {anuncio.servicos && anuncio.servicos.length > 0 && (
           <section className="mt-4 rounded-xl p-6" style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }}>
             <h2 className="mb-3 text-lg font-bold text-white">Servicos</h2>
