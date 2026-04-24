@@ -6,6 +6,35 @@ import type { OurFileRouter } from "../api/uploadthing/route";
 
 const UploadButton = generateUploadButton<OurFileRouter>();
 
+async function aplicarMarcaDagua(file: File): Promise<File> {
+  return new Promise((resolve) => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d")!;
+    const img = new window.Image();
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      const fadinha = new window.Image();
+      fadinha.onload = () => {
+        const h = Math.min(img.height * 0.25, 180);
+        const w = fadinha.width * (h / fadinha.height);
+        ctx.globalAlpha = 0.35;
+        ctx.drawImage(fadinha, img.width - w - 15, img.height - h - 15, w, h);
+        ctx.globalAlpha = 1;
+        ctx.font = `bold ${Math.max(14, img.width * 0.04)}px Arial`;
+        ctx.fillStyle = "rgba(255,255,255,0.5)";
+        ctx.fillText("AcompanhantesNaWeb", 12, img.height - 12);
+        canvas.toBlob((blob) => {
+          resolve(new File([blob!], file.name, { type: "image/jpeg" }));
+        }, "image/jpeg", 0.92);
+      };
+      fadinha.src = "/fadinha.png";
+    };
+    img.src = URL.createObjectURL(file);
+  });
+}
+
 const estados = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
 const servicosOpcoes = ["Beijo na boca","Oral sem camisinha","Oral com camisinha","Anal","Dupla penetracao","Completa","Garganta profunda","Gozo na boca","Gozo no corpo","Sexo com camisinha","Sexo sem camisinha","Pernoite","24h","Com local","Sem local","Aceita cartao","Liberal","Mostra rosto","Tem videos","Chamada de video","Faz programa","Nao faz programa","Fetiche","Beijo grego","Massagem","Acompanhante social","Viagem"];
 const biotiposOpcoes = ["Baixinha","Gordinha","Modelo","Cavala","Ninfeta","Peitosa"];
@@ -168,6 +197,10 @@ export default function AnunciarPage() {
               </p>
               <UploadButton
                 endpoint="imageUploader"
+                onBeforeUploadBegin={async (files) => {
+                  const processadas = await Promise.all(files.map(aplicarMarcaDagua));
+                  return processadas;
+                }}
                 onClientUploadComplete={(res) => {
                   if (res) {
                     const urls = res.map((r) => (r as any).ufsUrl || r.url);
@@ -219,3 +252,5 @@ export default function AnunciarPage() {
     </main>
   );
 }
+
+
