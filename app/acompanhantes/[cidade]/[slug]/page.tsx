@@ -202,41 +202,32 @@ export default function PaginaAnuncio({ params }: { params: { cidade: string; sl
           </section>
         )}
 
-        {anuncio.anuncios_tags && anuncio.anuncios_tags.length > 0 && (() => {
-          const servicos = anuncio.anuncios_tags.filter((at: any) => at.tags.cluster === "servico")
-          const biotipos = anuncio.anuncios_tags.filter((at: any) => at.tags.cluster === "biotipo")
-          const categorias = anuncio.anuncios_tags.filter((at: any) => !at.tags.cluster || at.tags.cluster === "categoria" || (!["servico","biotipo"].includes(at.tags.cluster)))
-          return (
-            <>
-              {servicos.length > 0 && (
-                <section className="mt-4 rounded-xl p-6" style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }}>
-                  <h2 className="mb-4 text-lg font-bold text-white">O que eu faco</h2>
-                  <div className="flex flex-wrap gap-2">
-                    {servicos.map((at: any) => (
-                      <span key={at.tags.slug} className="rounded-full px-3 py-1.5 text-sm font-medium"
-                        style={{ backgroundColor: "#3a1550", border: "1px solid #C0306A", color: "#fff" }}>
-                        {at.tags.nome}
-                      </span>
-                    ))}
-                  </div>
-                </section>
-              )}
-              {biotipos.length > 0 && (
-                <section className="mt-4 rounded-xl p-6" style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }}>
-                  <h2 className="mb-4 text-lg font-bold text-white">Biotipo</h2>
-                  <div className="flex flex-wrap gap-2">
-                    {biotipos.map((at: any) => (
-                      <span key={at.tags.slug} className="rounded-full px-3 py-1.5 text-sm font-medium"
-                        style={{ backgroundColor: "#1e3a5f", border: "1px solid #60a5fa", color: "#60a5fa" }}>
-                        {at.tags.nome}
-                      </span>
-                    ))}
-                  </div>
-                </section>
-              )}
-            </>
-          )
-        })()}
+        {anuncio.anuncios_tags && anuncio.anuncios_tags.filter((at: any) => at.tags.cluster === "servico").length > 0 && (
+          <section className="mt-4 rounded-xl p-6" style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }}>
+            <h2 className="mb-4 text-lg font-bold text-white">O que eu faco</h2>
+            <div className="flex flex-wrap gap-2">
+              {anuncio.anuncios_tags.filter((at: any) => at.tags.cluster === "servico").map((at: any) => (
+                <span key={at.tags.slug} className="rounded-full px-3 py-1.5 text-sm font-medium"
+                  style={{ backgroundColor: "#3a1550", border: "1px solid #C0306A", color: "#fff" }}>
+                  {at.tags.nome}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
+        {anuncio.anuncios_tags && anuncio.anuncios_tags.filter((at: any) => at.tags.cluster === "biotipo").length > 0 && (
+          <section className="mt-4 rounded-xl p-6" style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }}>
+            <h2 className="mb-4 text-lg font-bold text-white">Biotipo</h2>
+            <div className="flex flex-wrap gap-2">
+              {anuncio.anuncios_tags.filter((at: any) => at.tags.cluster === "biotipo").map((at: any) => (
+                <span key={at.tags.slug} className="rounded-full px-3 py-1.5 text-sm font-medium"
+                  style={{ backgroundColor: "#1e3a5f", border: "1px solid #60a5fa", color: "#60a5fa" }}>
+                  {at.tags.nome}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
             </div>
           </section>
         )}
