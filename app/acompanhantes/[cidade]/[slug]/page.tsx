@@ -202,14 +202,14 @@ export default function PaginaAnuncio({ params }: { params: { cidade: string; sl
           </section>
         )}
 
-        {/* Servi├ºos */}
-        {anuncio.servicos && anuncio.servicos.length > 0 && (
+        {anuncio.anuncios_tags && anuncio.anuncios_tags.length > 0 && (
           <section className="mt-4 rounded-xl p-6" style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }}>
-            <h2 className="mb-3 text-lg font-bold text-white">Servicos</h2>
+            <h2 className="mb-3 text-lg font-bold text-white">Especialidades</h2>
             <div className="flex flex-wrap gap-2">
-              {anuncio.servicos.map((s: string) => (
-                <span key={s} className="rounded-full px-3 py-1 text-sm" style={{ backgroundColor: "#1A0A1E", border: "1px solid #4A1A5C", color: "#c9a8e0" }}>
-                  {s}
+              {anuncio.anuncios_tags.map((at: any) => (
+                <span key={at.tags.slug} className="rounded-full px-3 py-1 text-sm font-medium"
+                  style={{ backgroundColor: "#3a1550", border: "1px solid #C0306A", color: "#fff" }}>
+                  {at.tags.nome}
                 </span>
               ))}
             </div>

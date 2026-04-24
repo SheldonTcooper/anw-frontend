@@ -1,11 +1,16 @@
-export const dynamic = 'force-dynamic'
+﻿export const dynamic = 'force-dynamic'
 
 export async function GET(request, { params }) {
   try {
     const { prisma } = await import('../../../../lib/prisma')
     const anuncio = await prisma.anuncios.findUnique({
       where: { slug: params.slug },
-      include: { midias: { orderBy: { ordem: 'asc' } } }
+      include: {
+        midias: { orderBy: { ordem: 'asc' } },
+        anuncios_tags: {
+          include: { tags: true }
+        }
+      }
     })
     if (!anuncio) {
       return Response.json({ success: false, error: 'Anuncio nao encontrado' }, { status: 404 })
