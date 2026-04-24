@@ -38,7 +38,7 @@ async function aplicarMarcaDagua(file: File): Promise<File> {
 const estados = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
 const servicosOpcoes = ["Beijo na boca","Oral sem camisinha","Oral com camisinha","Anal","Dupla penetracao","Completa","Garganta profunda","Gozo na boca","Gozo no corpo","Sexo com camisinha","Sexo sem camisinha","Pernoite","24h","Com local","Sem local","Aceita cartao","Liberal","Mostra rosto","Tem videos","Chamada de video","Faz programa","Nao faz programa","Fetiche","Beijo grego","Massagem","Acompanhante social","Viagem"];
 const biotiposOpcoes = ["Baixinha","Gordinha","Modelo","Cavala","Ninfeta","Peitosa"];
-const identidadesOpcoes = ["Mulher","Trans Mulher","Trans Homem","Homem","Gay","Lesbica","Bissexual","Casal Hetero","Casal Gay","Casal Lesbico","Casal Bi","Travesti","Drag Queen","Não Binário","Massagista"];
+const identidadesOpcoes = ["Mulher","Trans Mulher","Trans Homem","Homem","Gay","Lesbica","Bissexual","Casal Hetero","Casal Gay","Casal Lesbico","Casal Bi","Travesti","Drag Queen","Nao Binario","Massagista"];
 
 function Secao({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
@@ -106,18 +106,17 @@ export default function AnunciarPage() {
     if (telefone !== telefoneConf) { alert("Os telefones nao coincidem."); return; }
     setLoading(true);
     try {
-      // Reordenar fotos para que a capa seja sempre a primeira
       const fotosOrdenadas = [...fotosRef.current];
       if (capaIdx > 0) {
         const capa = fotosOrdenadas.splice(capaIdx, 1)[0];
         fotosOrdenadas.unshift(capa);
       }
-      const res = await fetch('/api/anuncios/criar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/anuncios/criar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           titulo, descricao, cidade, estado, bairro,
-          whatsapp: telefone.replace(/\D/g, ''),
+          whatsapp: telefone.replace(/\D/g, ""),
           cache: cache ? parseFloat(cache) : null,
           dataNascimento: dataNascimento || null,
           servicos, biotipos, identidades,
@@ -127,7 +126,7 @@ export default function AnunciarPage() {
       const data = await res.json();
       if (data.success) {
         alert("Anuncio enviado para revisao! Entraremos em contato pelo WhatsApp para ativar seu plano.");
-        window.location.href = '/';
+        window.location.href = "/";
       } else {
         alert("Erro ao publicar: " + data.error);
       }
@@ -143,6 +142,7 @@ export default function AnunciarPage() {
       <div className="mx-auto max-w-3xl">
         <h1 className="mb-8 text-2xl font-bold text-white">Publicar <span style={{ color: "#C0306A" }}>Anuncio</span></h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+
           <Secao titulo="Informacoes basicas">
             <div className="flex flex-col gap-4">
               <Campo label="Titulo do anuncio">
@@ -184,12 +184,12 @@ export default function AnunciarPage() {
             </div>
           </Secao>
 
-          <Secao titulo="Servicos">
-            <CheckGrid opcoes={servicosOpcoes} selecionados={servicos} onChange={setServicos} />
-          </Secao>
-
           <Secao titulo="Como voce se identifica">
             <CheckGrid opcoes={identidadesOpcoes} selecionados={identidades} onChange={setIdentidades} />
+          </Secao>
+
+          <Secao titulo="Servicos">
+            <CheckGrid opcoes={servicosOpcoes} selecionados={servicos} onChange={setServicos} />
           </Secao>
 
           <Secao titulo="Biotipo">
@@ -258,9 +258,3 @@ export default function AnunciarPage() {
     </main>
   );
 }
-
-
-
-
-
-
