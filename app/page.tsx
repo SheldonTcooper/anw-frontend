@@ -2,14 +2,19 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
-const categorias = ["Todas", "Loiras", "Morenas", "Ruivas", "Acompanhantes de Luxo", "Universitarias"];
+const categorias = ["Todas", "Mulheres", "Trans", "Homens", "Gays", "Casais", "Loiras", "Morenas", "Ruivas", "Luxo", "Universitarias"];
 
 const CATEGORIA_TAG: Record<string, string> = {
-  "Loiras":               "loira",
-  "Morenas":              "morena",
-  "Ruivas":               "ruiva",
-  "Acompanhantes de Luxo":"luxo",
-  "Universitarias":       "universitaria",
+  "Mulheres":      "mulher",
+  "Trans":         "trans",
+  "Homens":        "homem",
+  "Gays":          "gay",
+  "Casais":        "casal",
+  "Loiras":        "loira",
+  "Morenas":       "morena",
+  "Ruivas":        "ruiva",
+  "Luxo":          "luxo",
+  "Universitarias":"universitaria",
 }
 
 const ESTADOS_BR = [
@@ -202,3 +207,5 @@ export default function Home() {
     </main>
   )
 }
+
+

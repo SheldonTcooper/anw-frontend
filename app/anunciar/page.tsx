@@ -38,6 +38,7 @@ async function aplicarMarcaDagua(file: File): Promise<File> {
 const estados = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
 const servicosOpcoes = ["Beijo na boca","Oral sem camisinha","Oral com camisinha","Anal","Dupla penetracao","Completa","Garganta profunda","Gozo na boca","Gozo no corpo","Sexo com camisinha","Sexo sem camisinha","Pernoite","24h","Com local","Sem local","Aceita cartao","Liberal","Mostra rosto","Tem videos","Chamada de video","Faz programa","Nao faz programa","Fetiche","Beijo grego","Massagem","Acompanhante social","Viagem"];
 const biotiposOpcoes = ["Baixinha","Gordinha","Modelo","Cavala","Ninfeta","Peitosa"];
+const identidadesOpcoes = ["Mulher","Trans Mulher","Trans Homem","Homem","Gay","Lesbica","Bissexual","Casal Hetero","Casal Gay","Casal Lesbico","Casal Bi","Travesti","Drag Queen","Não Binário","Massagista"];
 
 function Secao({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
@@ -88,6 +89,7 @@ export default function AnunciarPage() {
   const [bairro, setBairro] = useState("");
   const [servicos, setServicos] = useState<string[]>([]);
   const [biotipos, setBiotipos] = useState<string[]>([]);
+  const [identidades, setIdentidades] = useState<string[]>([]);
   const [fotosUrls, setFotosUrls] = useState<string[]>([]);
   const [capaIdx, setCapaIdx] = useState(0);
   const fotosRef = useRef<string[]>([]);
@@ -118,7 +120,7 @@ export default function AnunciarPage() {
           whatsapp: telefone.replace(/\D/g, ''),
           cache: cache ? parseFloat(cache) : null,
           dataNascimento: dataNascimento || null,
-          servicos, biotipos,
+          servicos, biotipos, identidades,
           fotosUrls: fotosOrdenadas,
         })
       });
@@ -184,6 +186,10 @@ export default function AnunciarPage() {
 
           <Secao titulo="Servicos">
             <CheckGrid opcoes={servicosOpcoes} selecionados={servicos} onChange={setServicos} />
+          </Secao>
+
+          <Secao titulo="Como voce se identifica">
+            <CheckGrid opcoes={identidadesOpcoes} selecionados={identidades} onChange={setIdentidades} />
           </Secao>
 
           <Secao titulo="Biotipo">
@@ -252,5 +258,9 @@ export default function AnunciarPage() {
     </main>
   );
 }
+
+
+
+
 
 

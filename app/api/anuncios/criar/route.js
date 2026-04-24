@@ -56,7 +56,7 @@ export async function POST(request) {
       return Response.json({ success: false, error: "Dados invalidos: " + erros }, { status: 400 })
     }
 
-    const { titulo, descricao, cidade, estado, bairro, whatsapp, cache, dataNascimento, fotosUrls, servicos, biotipos } = parsed.data
+    const { titulo, descricao, cidade, estado, bairro, whatsapp, cache, dataNascimento, fotosUrls, servicos, biotipos, identidades } = parsed.data
 
     const slug = slugify(titulo) + '-' + Date.now()
     const whatsappLimpo = whatsapp.replace(/\D/g, '')
@@ -92,6 +92,7 @@ export async function POST(request) {
     const todasTags = [
       ...(servicos || []).map(s => ({ slug: 'srv-' + slugify(s), nome: s, cluster: 'servico' })),
       ...(biotipos || []).map(b => ({ slug: 'bio-' + slugify(b), nome: b, cluster: 'biotipo' })),
+      ...(identidades || []).map(id => ({ slug: 'id-' + slugify(id), nome: id, cluster: 'identidade' })),
     ]
 
     for (const tagData of todasTags) {
@@ -114,3 +115,6 @@ export async function POST(request) {
     return Response.json({ success: false, error: "Erro interno" }, { status: 500 })
   }
 }
+
+
+
