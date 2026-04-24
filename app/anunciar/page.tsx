@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useRef } from "react";
 import { X } from "lucide-react";
 import { generateUploadButton } from "@uploadthing/react";
@@ -7,7 +7,7 @@ import type { OurFileRouter } from "../api/uploadthing/route";
 const UploadButton = generateUploadButton<OurFileRouter>();
 
 const estados = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
-const servicosOpcoes = ["Beijo na boca","Oral sem camisinha","Anal","Dupla penetracao","Completa","Garganta profunda","Gozo na boca","Pernoite","24h","Com local","Aceita cartao","Liberal","Mostra rosto","Tem videos"];
+const servicosOpcoes = ["Beijo na boca","Oral sem camisinha","Oral com camisinha","Anal","Dupla penetracao","Completa","Garganta profunda","Gozo na boca","Gozo no corpo","Sexo com camisinha","Sexo sem camisinha","Pernoite","24h","Com local","Sem local","Aceita cartao","Liberal","Mostra rosto","Tem videos","Chamada de video","Faz programa","Nao faz programa","Fetiche","Beijo grego","Massagem","Acompanhante social","Viagem"];
 const biotiposOpcoes = ["Baixinha","Gordinha","Modelo","Cavala","Ninfeta","Peitosa"];
 
 function Secao({ titulo, children }: { titulo: string; children: React.ReactNode }) {
