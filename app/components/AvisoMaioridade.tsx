@@ -1,46 +1,27 @@
-"use client";
-import { useRouter, usePathname } from "next/navigation";
-
-const paginasLivres = [
-  "/admin",
-  "/login",
-  "/termos-de-uso",
-  "/privacidade",
-  "/como-funciona",
-  "/painel",
-  "/anunciar",
-  "/acompanhantes",
-  "/cliente",
-];
+﻿"use client";
+import { useState, useEffect } from "react";
 
 export default function AvisoMaioridade() {
-  const router = useRouter();
-  const pathname = usePathname();
+  const [mostrar, setMostrar] = useState(false);
 
-  const isPaginaLivre = paginasLivres.some(p => pathname?.startsWith(p));
-  if (isPaginaLivre) return null;
+  useEffect(() => {
+    const confirmado = document.cookie.includes("maioridade_confirmada");
+    if (!confirmado) setMostrar(true);
+  }, []);
 
   const confirmarMaioridade = () => {
-    try {
-      const usuario = localStorage.getItem("usuario");
-      if (usuario) {
-        // Já logado — só fecha o aviso recarregando
-        const el = document.getElementById("aviso-maioridade");
-        if (el) el.style.display = "none";
-      } else {
-        router.push("/login");
-      }
-    } catch {
-      router.push("/login");
-    }
+    document.cookie = "maioridade_confirmada=1; path=/; max-age=" + (60 * 60 * 24 * 30);
+    setMostrar(false);
   };
 
   const sair = () => {
     window.location.href = "https://www.google.com.br";
   };
 
+  if (!mostrar) return null;
+
   return (
-    <div id="aviso-maioridade" className="fixed inset-0 z-50 flex items-center justify-center px-4"
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4"
       style={{ backgroundColor: "rgba(0,0,0,0.95)", backdropFilter: "blur(8px)" }}>
       <div className="w-full max-w-sm rounded-2xl p-8 text-center"
         style={{ backgroundColor: "#250C30", border: "2px solid #C0306A" }}>
@@ -53,7 +34,7 @@ export default function AvisoMaioridade() {
           Acesso restrito a maiores de 18 anos
         </p>
         <p className="mb-8 text-xs leading-relaxed" style={{ color: "#c9a8e0" }}>
-          Este site contém conteúdo adulto. Ao entrar, você declara ter 18 anos ou mais e concorda com os nossos{" "}
+          Este site contém conteudo adulto. Ao entrar, você declara ter 18 anos ou mais e concorda com os nossos{" "}
           <a href="/termos-de-uso" target="_blank" className="underline" style={{ color: "#C0306A" }}>Termos de Uso</a>.
         </p>
         <div className="flex flex-col gap-3">
