@@ -29,6 +29,14 @@ export default function PaginaAnuncio({ params }: { params: { cidade: string; sl
   const [curtido, setCurtido] = useState(false);
   const [fotoAtiva, setFotoAtiva] = useState(0);
   const [horasSelecionadas, setHorasSelecionadas] = useState<number | null>(null);
+  const [usuario, setUsuario] = useState<any>(null);
+
+  useEffect(() => {
+    try {
+      const u = localStorage.getItem("usuario");
+      if (u) setUsuario(JSON.parse(u));
+    } catch {}
+  }, []);
 
   useEffect(() => {
     fetch("/api/anuncios/" + params.slug)
@@ -189,19 +197,35 @@ export default function PaginaAnuncio({ params }: { params: { cidade: string; sl
 
             <div className="flex flex-col gap-3">
               {anuncio.whatsapp && (
-                <a href={mensagemWhatsApp()} target="_blank" rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 rounded-lg py-3 text-base font-bold text-white hover:opacity-90"
-                  style={{ backgroundColor: "#25D366" }}>
-                  <MessageCircle size={20} />
-                  {horasSelecionadas ? "CHAMAR NO WHATSAPP - R$ " + valorTotal?.toFixed(0) : "WHATSAPP"}
-                </a>
+                usuario ? (
+                  <a href={mensagemWhatsApp()} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 rounded-lg py-3 text-base font-bold text-white hover:opacity-90"
+                    style={{ backgroundColor: "#25D366" }}>
+                    <MessageCircle size={20} />
+                    {horasSelecionadas ? "CHAMAR NO WHATSAPP - R$ " + valorTotal?.toFixed(0) : "WHATSAPP"}
+                  </a>
+                ) : (
+                  <a href={"/login?redirect=" + encodeURIComponent(window.location.pathname)}
+                    className="flex items-center justify-center gap-2 rounded-lg py-3 text-base font-bold text-white hover:opacity-90"
+                    style={{ backgroundColor: "#25D366" }}>
+                    <MessageCircle size={20} /> Ver contato
+                  </a>
+                )
               )}
               {anuncio.telefonePublico && (
-                <a href={"tel:+55" + anuncio.telefonePublico}
-                  className="flex items-center justify-center gap-2 rounded-lg py-3 text-base font-bold text-white hover:opacity-80"
-                  style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }}>
-                  <Phone size={20} /> LIGAR
-                </a>
+                usuario ? (
+                  <a href={"tel:+55" + anuncio.telefonePublico}
+                    className="flex items-center justify-center gap-2 rounded-lg py-3 text-base font-bold text-white hover:opacity-80"
+                    style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }}>
+                    <Phone size={20} /> LIGAR
+                  </a>
+                ) : (
+                  <a href="/login"
+                    className="flex items-center justify-center gap-2 rounded-lg py-3 text-base font-bold text-white hover:opacity-80"
+                    style={{ backgroundColor: "#250C30", border: "1px solid #4A1A5C" }}>
+                    <Phone size={20} /> Ver telefone
+                  </a>
+                )
               )}
             </div>
           </div>
